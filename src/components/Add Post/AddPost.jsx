@@ -84,7 +84,7 @@ const AddPost = ({ isModalOpen, setIsModalOpen }) => {
         className=" hidden rounded-2xl bg-amber-500"
         id="inputFile"
         type="file"
-        accept="image/*,video/*"
+        accept="image/*"
         onChange={handleMedia}
 
       />

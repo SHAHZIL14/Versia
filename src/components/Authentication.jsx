@@ -26,7 +26,7 @@ const Authentication = () => {
               } bg-gradient-to-bl from-black/50 to-[var(--brand-color)] text-white text-3xl flex justify-center items-center  absolute top-0 left-0`}
             >
 
-              <strong className=" absolute uppercase tracking-wider">One Folk</strong>
+              <strong className=" absolute uppercase tracking-wider">Versia</strong>
             </div>
           </div>
           <div
@@ -43,7 +43,7 @@ const Authentication = () => {
                 isUserNew ? "flex" : "-translate-x-full opacity-0"
               } bg-gradient-to-br from-black/50 to-[var(--brand-color)] text-white text-3xl flex justify-center items-center  absolute top-0 right-0`}
             >
-              <strong className="uppercase tracking-wider">Versea</strong>
+              <strong className="uppercase tracking-wider">Versia</strong>
             </div>
           </div>
         </div>

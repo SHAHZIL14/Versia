@@ -22,7 +22,7 @@ function Card({
         console.log("clicked double");
         setIsLiked(true);
       }}
-      className=" w-full flex-col flex cursor-pointer min-h-96 h-fit text-xs md:text-sm lg:text-md  mx-auto overflow-hidden  border-blue-80 bg-white  shadow-md py-0"
+      className=" w-full flex-col flex cursor-pointer min-h-96 h-fit text-xs md:text-sm lg:text-md  mx-auto overflow-hidden  border-blue-80 bg-white  py-0"
     >
       {/* card Header */}
       <CardHeader

@@ -67,7 +67,7 @@ const Header = ({ setIsModalOpen }) => {
         </ul>
         <div
           id="user-profile-button"
-          className="flex justify-center items-center  "
+          className="flex justify-center items-center absolute right-2 lg:right-4  "
         >
           <Tooltip content='logout' className=' capitalize font-medium z-20 text-[var(--brand-color)] bg-white p-1'>
             <Button
