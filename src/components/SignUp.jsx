@@ -85,7 +85,7 @@ const SignUp = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
   return (
     <div className="">
       <video
-        src="signUp.mp4"
+        src="/signUp.mp4"
         autoPlay
         muted
         loop
