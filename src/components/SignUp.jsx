@@ -7,13 +7,11 @@ import { useDispatch } from "react-redux";
 import userServices from "../../services/User";
 import { useNavigate } from "react-router-dom";
 
-
 const SignUp = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
   let [profileInput, setProfileInput] = useState(null);
   let [profile, setProfile] = useState("Add Profile");
   let [hasWarned, setHasWarned] = useState(false);
   const dispatch = useDispatch();
-  const navigateTo = useNavigate();
   const {
     register,
     watch,
@@ -31,9 +29,12 @@ const SignUp = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
   };
   const onSubmit = async ({ name, username, email, password }) => {
     if (!hasWarned && !profileInput) {
-      toast.warn(`You haven't upload any picture, just a reminder you can carry on...`, {
-        autoClose: 4000 
-      });
+      toast.warn(
+        `You haven't upload any picture, just a reminder you can carry on...`,
+        {
+          autoClose: 4000,
+        }
+      );
       setHasWarned(true);
       return;
     }
@@ -62,12 +63,12 @@ const SignUp = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
                       profile: userDoc.profileSource,
                     })
                   );
-                  navigateTo("/home");
-                  setTimeout(() => setAuthLoading(false), 2000);
-                  toast.success("Registered and logged in successfully", {
-                    className: "my-toast",
-                    bodyClassName: "my-toast-body",
-                  });
+                  authService
+                    .sendVerificationLink()
+                    .then(() => {
+                      toast.info("Check your mail inbox for verification");
+                    })
+                    .catch((err) => console.log(err));
                 } else {
                   toast.error("something went wrong");
                 }
@@ -79,18 +80,21 @@ const SignUp = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
       .catch((error) => toast.error(error.message))
       .finally(() => setTimeout(() => setAuthLoading(false), 3000));
     reset();
-    setProfileInput("");
+    setProfileInput(null);
+    setProfile("Add Profile");
   };
 
   return (
     <div className="">
       <video
-        src="/signUp.mp4"
         autoPlay
         muted
         loop
-        className="  absolute lg:-top-20 muted brightness-[20%]  -left-0 w-full h-full  lg:w-[140%] lg:h-[140%]  object-cover"
-      ></video>
+        playsInline
+        className="absolute lg:-top-20 muted brightness-[20%]  -left-0 w-full h-full  lg:w-[140%] lg:h-[140%]  object-cover"
+      >
+      <source src="https://res.cloudinary.com/ddoxcrq4q/video/upload/v1753309978/signUp_kwtab9.mp4" type="video/mp4"/>  
+      </video>
       <div
         className={`${
           isUserNew ? "absolute" : "static"

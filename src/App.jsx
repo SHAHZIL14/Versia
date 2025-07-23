@@ -7,6 +7,7 @@ import Home from "./components/Home";
 import Authentication from "./components/Authentication";
 import About from "./components/About";
 import AuthLayout from "../layout/AuthLayout";
+import Verification from "./verification/Verification";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useDispatch, useSelector } from "react-redux";
@@ -38,8 +39,10 @@ function App() {
           ],
         },
         { path: "/about", element: <About /> },
+        { path: "/verify", element: <Verification /> },
         { path: "/auth", element: <Authentication /> },
         { path: "*", element: <Navigate to="/" /> },
+
       ],
     },
   ]);
@@ -49,7 +52,7 @@ function App() {
       <RouterProvider router={router} />
       <ToastContainer
         position="top-right"
-        autoClose={500}
+        autoClose={4000}
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick={false}

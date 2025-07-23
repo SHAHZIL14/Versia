@@ -28,7 +28,7 @@ const AddPost = ({ isModalOpen, setIsModalOpen }) => {
   const addPost = () => {
     if (!status || !inputMedia || !caption || !userId) {
       toast.error("Upload the picture with caption",{
-        autoClose:3000
+        autoClose:4000
       });
       return;
     }
@@ -55,9 +55,9 @@ const AddPost = ({ isModalOpen, setIsModalOpen }) => {
               "preview"
             ).style.background = 'none';
           })
-          .catch((err) => toast.error(err,{autoClose:3000}));
+          .catch((err) => toast.error(err,{autoClose:4000}));
       })
-      .catch((err) => toast.error(err,{autoClose:3000}));
+      .catch((err) => toast.error(err,{autoClose:4000}));
   };
 
   useEffect(() => {

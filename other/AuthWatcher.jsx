@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from "react-redux";
-import { useEffect } from "react";
+import { useEffect,useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import authService from "../services/Auth";
 import { ThreeDot } from "react-loading-indicators";
@@ -14,12 +14,12 @@ const AuthWatcher = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-
+  let [refreshKey,setRefreshKey] = useState(0);
   useEffect(() => {
     authService
       .getUser()
       .then((user) => {
-        if (user) {
+        if (user && user.emailVerification) {
           userServices.getUserInfo(user.$id).then((userDoc) => {
             dispatch(
               logIn({
@@ -45,7 +45,7 @@ const AuthWatcher = () => {
         console.warn(error);
         dispatch(setLoading(false));
       });
-  }, []); // ✅ Run only once on mount
+  }, [refreshKey]); // ✅ Run only once on mount
 
   const loading = useSelector((state) => state.auth.loading);
   return loading ? (
@@ -60,3 +60,5 @@ const AuthWatcher = () => {
 };
 
 export default AuthWatcher;
+
+export const runAuthWatcher =()=>{setRefreshKey((prev)=>prev+1)};

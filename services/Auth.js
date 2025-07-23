@@ -9,7 +9,7 @@ class AuthenticationServices {
         this.account = new Account(client);
     }
 
-    async register(email, password , name) {
+    async register(email, password, name) {
         try {
             return await this.account.create(
                 ID.unique(),
@@ -43,6 +43,22 @@ class AuthenticationServices {
     async getUser() {
         try {
             return await this.account.get()
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async sendVerificationLink() {
+        try {
+            return await this.account.createVerification('https://versia.vercel.app/verify');
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async verifyEmailAddress(userId, secret) {
+        try {
+            return await this.account.updateVerification(userId, secret);
         } catch (error) {
             throw error;
         }

@@ -11,5 +11,3 @@ export const refreshProvider = ({ children }) => {
         </refreshContext.Provider>
     );
 };
-
-export const useRefreshContext = () => useContext(refreshContext);

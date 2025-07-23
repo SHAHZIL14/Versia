@@ -26,6 +26,7 @@ const Login = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
     setAuthLoading(true);
     authService.getUser().then((userSession) => {
       if (userSession) authService.logout();
+      console.log("loggedout");
     });
 
     authService
@@ -43,12 +44,23 @@ const Login = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
                     profile: userDoc.profileSource,
                   })
                 );
-                navigateTo("/home");
-                setTimeout(() => setAuthLoading(false), 2000);
-                toast.success("Login successfully", {
-                  className: "my-toast",
-                  bodyClassName: "my-toast-body",
-                });
+                if (user.emailVerification) {
+                  navigateTo("/home");
+                  setTimeout(() => setAuthLoading(false), 2000);
+                  toast.success("Login successfully", {
+                    className: "my-toast",
+                    bodyClassName: "my-toast-body",
+                  });
+                } else {
+                  authService
+                    .sendVerificationLink()
+                    .then(() => {
+                      toast.info(
+                        "Your email is not verified!!.Check your mail inbox for verification first."
+                      );
+                    })
+                    .catch((err) => console.log(err));
+                }
               } else {
                 toast.error("something went wrong");
               }
@@ -61,19 +73,21 @@ const Login = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
       .catch((err) => {
         toast.error(err.message);
       })
-      .finally(()=>setTimeout(() => setAuthLoading(false), 3000))
+      .finally(() => setTimeout(() => setAuthLoading(false), 3000));
     reset();
   };
 
   return (
     <div>
       <video
-        src="/logIn.mp4"
         autoPlay
         muted
         loop
+        playsInline
         className="absolute lg:-top-20 muted brightness-[20%] -left-0 w-full h-full lg:w-[140%] lg:h-[140%]  object-cover"
-      ></video>
+      >
+      <source src="https://res.cloudinary.com/ddoxcrq4q/video/upload/v1753309882/logIn_w1eyr5.mp4" type="video/mp4" />  
+      </video>
       <div
         className={`${
           isUserNew ? "static" : "absolute"
