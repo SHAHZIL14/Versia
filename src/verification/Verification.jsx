@@ -16,7 +16,7 @@ const Verification = () => {
       .verifyEmailAddress(userId, secret)
       .then(function (response) {
         toast.success("Verified");
-        navigate("/login");
+        navigate("/home");
       })
       .catch(function (error) {
         toast.error("Not verified!");
