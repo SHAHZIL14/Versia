@@ -23,7 +23,6 @@ function App() {
     return;
   };
   useEffect(() => {
-
     fetchPosts();
   }, [refresh]);
   const router = createBrowserRouter([
@@ -50,14 +49,15 @@ function App() {
       <RouterProvider router={router} />
       <ToastContainer
         position="top-right"
-        autoClose={1000}
-        hideProgressBar={true}
+        autoClose={500}
+        hideProgressBar={false}
         newestOnTop={false}
-        closeOnClick
+        closeOnClick={false}
+        rtl={false}
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        theme="colored" // options: light, dark, colored
+        theme="light"
       />
     </>
   );

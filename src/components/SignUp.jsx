@@ -6,10 +6,12 @@ import { logIn } from "../../store/authentication/authenticationSlice";
 import { useDispatch } from "react-redux";
 import userServices from "../../services/User";
 import { useNavigate } from "react-router-dom";
-import { Plus } from "lucide-react";
-const SignUp = ({ isUserNew, setIsUserNew }) => {
+
+
+const SignUp = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
   let [profileInput, setProfileInput] = useState(null);
   let [profile, setProfile] = useState("Add Profile");
+  let [hasWarned, setHasWarned] = useState(false);
   const dispatch = useDispatch();
   const navigateTo = useNavigate();
   const {
@@ -28,6 +30,14 @@ const SignUp = ({ isUserNew, setIsUserNew }) => {
     document.getElementById("profilePic").src = `${URL.createObjectURL(file)}`;
   };
   const onSubmit = async ({ name, username, email, password }) => {
+    if (!hasWarned && !profileInput) {
+      toast.warn(`You haven't upload any picture, just a reminder you can carry on...`, {
+        autoClose: 4000 
+      });
+      setHasWarned(true);
+      return;
+    }
+    setAuthLoading(true);
     authService.getUser().then((userSession) => {
       if (userSession) authService.logout();
     });
@@ -52,11 +62,12 @@ const SignUp = ({ isUserNew, setIsUserNew }) => {
                       profile: userDoc.profileSource,
                     })
                   );
+                  navigateTo("/home");
+                  setTimeout(() => setAuthLoading(false), 2000);
                   toast.success("Registered and logged in successfully", {
                     className: "my-toast",
                     bodyClassName: "my-toast-body",
                   });
-                  navigateTo("/home");
                 } else {
                   toast.error("something went wrong");
                 }
@@ -65,7 +76,8 @@ const SignUp = ({ isUserNew, setIsUserNew }) => {
           })
           .catch((error) => console.log(error));
       })
-      .catch((error) => toast.error(error.message));
+      .catch((error) => toast.error(error.message))
+      .finally(() => setTimeout(() => setAuthLoading(false), 3000));
     reset();
     setProfileInput("");
   };
@@ -73,7 +85,7 @@ const SignUp = ({ isUserNew, setIsUserNew }) => {
   return (
     <div className="">
       <video
-        src="signUp.mov"
+        src="signUp.mp4"
         autoPlay
         muted
         loop
@@ -144,7 +156,8 @@ const SignUp = ({ isUserNew, setIsUserNew }) => {
                 required: "username is required",
                 pattern: {
                   value: /^(?![_\d])[a-z0-9_]+$/,
-                  message: "Enter valid username",
+                  message:
+                    "Only lowercase letters, numbers, underscores. Cannot start with number and _",
                 },
                 validate: (value) => {
                   const trimmed = value.trim();

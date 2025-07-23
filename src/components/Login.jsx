@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import authService from "../../services/Auth";
 import { useDispatch } from "react-redux";
@@ -6,7 +6,8 @@ import { logIn } from "../../store/authentication/authenticationSlice";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import userServices from "../../services/User";
-const Login = ({ isUserNew, setIsUserNew }) => {
+import { ThreeDot } from "react-loading-indicators";
+const Login = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
   const dispatch = useDispatch();
   const navigateTo = useNavigate();
   const {
@@ -22,6 +23,11 @@ const Login = ({ isUserNew, setIsUserNew }) => {
   });
 
   const onSubmit = ({ email, password }) => {
+    setAuthLoading(true);
+    authService.getUser().then((userSession) => {
+      if (userSession) authService.logout();
+    });
+
     authService
       .login(email, password)
       .then((user) => {
@@ -37,11 +43,12 @@ const Login = ({ isUserNew, setIsUserNew }) => {
                     profile: userDoc.profileSource,
                   })
                 );
+                navigateTo("/home");
+                setTimeout(() => setAuthLoading(false), 2000);
                 toast.success("Login successfully", {
                   className: "my-toast",
                   bodyClassName: "my-toast-body",
                 });
-                navigateTo("/home");
               } else {
                 toast.error("something went wrong");
               }
@@ -53,20 +60,20 @@ const Login = ({ isUserNew, setIsUserNew }) => {
       })
       .catch((err) => {
         toast.error(err.message);
-      });
+      })
+      .finally(()=>setTimeout(() => setAuthLoading(false), 3000))
     reset();
   };
 
   return (
     <div>
       <video
-        src="logIn.mov"
+        src="logIn.mp4"
         autoPlay
         muted
         loop
         className="absolute lg:-top-20 muted brightness-[20%] -left-0 w-full h-full lg:w-[140%] lg:h-[140%]  object-cover"
       ></video>
-
       <div
         className={`${
           isUserNew ? "static" : "absolute"

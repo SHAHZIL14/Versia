@@ -5,8 +5,9 @@ import { X } from "lucide-react";
 import storageServices from "../../../services/Storage";
 import postServices from "../../../services/Post";
 import { useDispatch, useSelector } from "react-redux";
-import config from "../../config/config";
-import {refresh} from '../../../store/refresh/refreshSlice' 
+import { refresh } from "../../../store/refresh/refreshSlice";
+import { motion } from "motion/react";
+import {BlinkBlur} from 'react-loading-indicators'
 const AddPost = ({ isModalOpen, setIsModalOpen }) => {
   const dispatch = useDispatch();
   let [inputMedia, setInputMedia] = useState("");
@@ -26,7 +27,9 @@ const AddPost = ({ isModalOpen, setIsModalOpen }) => {
 
   const addPost = () => {
     if (!status || !inputMedia || !caption || !userId) {
-      toast.error("Upload the picture with caption");
+      toast.error("Upload the picture with caption",{
+        autoClose:3000
+      });
       return;
     }
     setIsLoading((prev) => !prev);
@@ -34,22 +37,27 @@ const AddPost = ({ isModalOpen, setIsModalOpen }) => {
       .uploadFile(inputMedia)
       .then((file) => {
         const imageUrl = storageServices.getFileView(file.$id);
-        postServices.addPost({
-        caption,
-        imageUrl,
-        userId,
-        status})
-        .then(() => {
+        postServices
+          .addPost({
+            caption,
+            imageUrl,
+            userId,
+            status,
+          })
+          .then(() => {
             setIsLoading((prev) => !prev);
             toast.success("Post Uploaded");
-            setCaption('');
-            setInputMedia('');
-            setIsModalOpen((prev) => !prev)
+            setCaption("");
+            setInputMedia("");
+            setIsModalOpen((prev) => !prev);
             dispatch(refresh());
-        })
-        .catch((err) => toast.error(err));
+            document.getElementById(
+              "preview"
+            ).style.background = 'none';
+          })
+          .catch((err) => toast.error(err,{autoClose:3000}));
       })
-      .catch((err) => toast.error(err));
+      .catch((err) => toast.error(err,{autoClose:3000}));
   };
 
   useEffect(() => {
@@ -69,16 +77,27 @@ const AddPost = ({ isModalOpen, setIsModalOpen }) => {
         id="addPostLoading"
         className={`${
           isLoading ? "" : "hidden"
-        } absolute top-0 left-0 h-full w-full z-10 bg-gray-500 flex justify-center items-center`}
+        } absolute top-0 left-0 h-full w-full z-10 bg-black/30 backdrop-blur-sm flex justify-center items-center`}
       >
-        <p>Loading.....</p>
+        {/* <motion.div
+          className="h-20 w-20 lg:w-40 lg:h-40 border-2 border-dashed  border-white rounded-[50%]"
+          initial={{ rotate: 0}}
+          animate={{ rotate: 360}}
+          transition={{
+            repeat: Infinity,
+            duration: 5,
+            ease: 'linear',
+            type:'tween',
+          }}
+        ></motion.div> */}
+        <BlinkBlur color={["#000000", "#082828", "#115252", "#1a7c7c"]} text='Showcasing your picture to the world' textColor="white" />
       </div>
       <button
         onClick={(e) => setIsModalOpen((prev) => !prev)}
         id="close-modal"
         className="absolute right-5 top-5 cursor-pointer z-10 "
       >
-        <X />
+        <X className={`${isLoading ? "hidden" : ""}`} />
       </button>
       <input
         className=" hidden rounded-2xl bg-amber-500"
@@ -86,7 +105,6 @@ const AddPost = ({ isModalOpen, setIsModalOpen }) => {
         type="file"
         accept="image/*"
         onChange={handleMedia}
-
       />
       <div
         id="preview"

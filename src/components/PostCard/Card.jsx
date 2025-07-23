@@ -16,13 +16,13 @@ function Card({
     <motion.div
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 ,repeatCount:0}}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-      viewport={{ once: true, amount: 0.3 }} 
+      transition={{ duration: 1, ease: "easeOut" }}
+      viewport={{ once: true, amount: 0.1 }} 
       onDoubleClick={() => {
         console.log("clicked double");
         setIsLiked(true);
       }}
-      className=" w-full flex-col flex cursor-pointer min-h-96 h-fit text-xs md:text-sm lg:text-md  mx-auto overflow-hidden  border-blue-80 bg-white  py-0"
+      className=" w-full flex-col flex cursor-pointer  h-fit text-xs md:text-sm lg:text-md   mx-auto overflow-hidden  border-blue-80 bg-white  py-0"
     >
       {/* card Header */}
       <CardHeader
@@ -38,8 +38,8 @@ function Card({
           alt=""
         />
       </div>
-      <div className="about-card">
-        <div className="actions  flex justify-start gap-x-5 border border-blak   p-3">
+      <div className="about-card flex flex-col gap-2">
+        <div className="actions  flex justify-start gap-x-5 border border-blak  pt-2 px-2">
           <button className=" ">
             <Heart
               className={`${
@@ -54,7 +54,7 @@ function Card({
             <Share className="w-5 h-5 text-[var(--brand-color)] hover:fill-gray-500" />
           </button>
         </div>
-        <div className="action-data text-black flex gap-x-3 py- px-2">
+        <div className="action-data text-black flex gap-x-3  px-2">
           <div>
             <strong>{likes.toString()} </strong>likes
           </div>
@@ -63,7 +63,7 @@ function Card({
           </div>
         </div>
         <div className="caption text-black px-2 pb-5">
-          <p>{caption}</p>
+          <p className="text-sm lg:text-base ">{caption}</p>
         </div>
       </div>
     </motion.div>

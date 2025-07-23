@@ -12,8 +12,11 @@ class UserSevices {
 
     async addUserInfo(userId, { username, password, email, name }, profilePicFile) {
         try {
-            const uploadedFileId =  (await storageServices.uploadFile(profilePicFile)).$id;
-            const profileSource = '' || storageServices.getFileView(uploadedFileId);
+            let profileSource = ''
+            if (profilePicFile) {
+            profileSource = storageServices.getFileView((await storageServices.uploadFile(profilePicFile)).$id);
+            }
+
             return await this.database.createDocument(
                 config.databaseID,
                 config.userCollectionID,

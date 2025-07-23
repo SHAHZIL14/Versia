@@ -4,12 +4,12 @@ import { NavLink } from "react-router-dom";
 import authService from "../../services/Auth";
 import { logOut } from "../../store/authentication/authenticationSlice";
 import { toast } from "react-toastify";
-import { Plus } from "lucide-react";
+import { Plus, Menu } from "lucide-react";
 import "../index.css";
 import { Tooltip, Button } from "@material-tailwind/react";
-const Header = ({ setIsModalOpen }) => {
+const Header = ({ isModalOpen, setIsModalOpen }) => {
   const username = useSelector((state) => state.auth.userData.name);
-  const profileSrc = useSelector((state) => state.auth.userData.profile);
+  const profileSrc = null || useSelector((state) => state.auth.userData.profile);
   const dispatch = useDispatch();
   let [isNavHidden, setIsNavHidden] = useState(true);
   let navItems = [
@@ -20,24 +20,26 @@ const Header = ({ setIsModalOpen }) => {
   ];
   return (
     <>
-      <div className="sticky z-10 top-0 left-0  overflow-hidden bg-[var(--brand-color)] flex justify-between lg:justify-center p-3 lg:p-2  box-border  items-center w-full ">
+      <div className="sticky top-0 left-0 z-10  overflow-hidden  bg-[var(--brand-color)]  flex justify-between lg:justify-center p-3 lg:p-2  box-border  items-center w-full ">
         <div className="text-3xl lg:absolute left-5  w-20 lg:w-40  text-white">
           <img src="/versia.png" className=" h-full w-full" alt="" />
         </div>
         <div
-          className="h-10 w-10 absolute right-15 lg:hidden"
+          className="h-8 w-8 absolute right-15 lg:hidden"
           id="nav-icon"
           onClick={() => setIsNavHidden((prev) => !prev)}
         >
-          <img src="/hamburgerIcon.svg" alt="" />
+          <Menu
+            className={`${
+              isNavHidden ? "" : "rotate-90 transition duration-200 ease-out"
+            } h-full w-full`}
+          />
         </div>
         <ul
           id=""
-          className={`fixed bg-[var(--brand-color)] flex justify-between top-13 p-3  gap-2    h-fit  lg:gap-5 flex-col left-0 lg:translate-x-0 lg:w-auto lg:flex-row lg:h-fit lg:opacity-100 lg:static  w-full text-white transition-all duration-500 ease-in-out
-    transform ${
-      isNavHidden
-        ? "-translate-x-full opacity-0 "
-        : "translate-x-0 opacity-100 "
+          className={`fixed bg-[var(--brand-color)] lg:bg-none  flex justify-between top-13 py-3 px-1  gap-0    h-fit  lg:gap-5 flex-col left-0 lg:translate-x-0 lg:w-auto lg:flex-row lg:h-fit lg:opacity-100 lg:static  w-full text-white transition-all duration-500 ease-in-out
+    transform rounded-b-md ${
+      isNavHidden ? "-translate-x-full" : "translate-x-0  ease-out duration-50 "
     } `}
         >
           {navItems.map((navItem) => (
@@ -46,7 +48,7 @@ const Header = ({ setIsModalOpen }) => {
               className={({ isActive }) =>
                 `${
                   isActive ? "text-white" : "text-gray-500"
-                } uppercase text-sm cursor-pointer  active:text-white text-gray-500 hover:text-white`
+                } uppercase text-sm cursor-pointer p-2  active:text-white text-gray-500 hover:text-white`
               }
               key={navItem.slug}
             >
@@ -58,8 +60,11 @@ const Header = ({ setIsModalOpen }) => {
             className=" capitalize font-medium z-20 text-[var(--brand-color)] bg-white p-1"
           >
             <Button
-              onClick={() => setIsModalOpen((prev) => !prev)}
-              className="uppercase text-sm cursor-pointer  active:text-white text-gray-500 hover:text-white shadow-none"
+              onClick={() => {
+                setIsNavHidden(true);
+                setIsModalOpen((prev) => !prev);
+              }}
+              className="uppercase px-2 lg:p-1 text-sm cursor-pointer  active:text-white text-gray-500 hover:text-white shadow-none"
             >
               <Plus className="border rounded text-white" />
             </Button>
@@ -69,8 +74,24 @@ const Header = ({ setIsModalOpen }) => {
           id="user-profile-button"
           className="flex justify-center items-center absolute right-2 lg:right-4  "
         >
-          <Tooltip content='logout' className=' capitalize font-medium z-20 text-[var(--brand-color)] bg-white p-1'>
+          <Tooltip
+            content="logout"
+            className=" capitalize font-medium z-20 text-[var(--brand-color)] bg-white"
+          >
             <Button
+              disableRipple
+              disableFocusRipple
+              sx={{
+                "&:focus": {
+                  backgroundColor: "transparent",
+                },
+                "&:active": {
+                  backgroundColor: "transparent",
+                },
+                "&:hover": {
+                  backgroundColor: "transparent",
+                },
+              }}
               onClick={() => {
                 authService
                   .logout()
@@ -85,17 +106,17 @@ const Header = ({ setIsModalOpen }) => {
                     toast.error(error);
                   });
               }}
-              className="rounded-[50%] uppercase  lg:mx-2 text-center font-bold  absolute right-2 lg:right-4 flex justify-center items-center cursor-pointer text-2xl"
+              className=" uppercase  lg:mx-2 text-center font-bold  absolute right-2 lg:right-4 flex justify-center items-center cursor-pointer text-2xl"
             >
               <div
                 id="profile"
-                className="h-7 w-7 lg:h-10 lg:w-10 flex justify-center items-center  rounded-[50%] overflow-hidden"
+                className="min-h-8 min-w-8 lg:h-12 lg:w-12 flex justify-center items-center  rounded-[50%] overflow-hidden"
               >
-                {profileSrc ? (
+                {profileSrc !== "" ? (
                   <img
-                    className="h-full w-full"
+                    className="h-8 w-8 lg:h-12 lg:w-12"
                     src={profileSrc}
-                    alt={username.charAt(0)}
+
                   />
                 ) : (
                   <p>{username?.charAt(0)}</p>
