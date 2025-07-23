@@ -215,8 +215,8 @@ const SignUp = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
               {...register("password", {
                 required: "Password is required",
                 minLength: {
-                  value: 6,
-                  message: "Password must be at least 6 characters",
+                  value: 8,
+                  message: "Password must be at least 8 characters",
                 },
               })}
               className="px-3 w-full py-2 bg-[var(--brand-color)] text-white rounded-xl  focus:outline-none focus:border-none focus:ring-0"

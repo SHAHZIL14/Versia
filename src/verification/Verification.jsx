@@ -5,6 +5,10 @@ const Verification = () => {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const userId = params.get("userId");
+    const secret = params.get("secret");
+    if(!userId || !secret){
+      return toast.error("Invalid Link");
+    }
     authService
       .verifyEmailAddress(userId, secret)
       .then(function (response) {
