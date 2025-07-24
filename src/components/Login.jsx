@@ -39,9 +39,10 @@ const Login = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
               if (userDoc) {
                 dispatch(
                   logIn({
-                    name: userDoc.username,
+                    name: userDoc.name,
+                    userName:userDoc.username,
                     userId: user.$id,
-                    profile: userDoc.profileSource,
+                    profileSource: userDoc.profileSource,
                   })
                 );
                 if (user.emailVerification) {

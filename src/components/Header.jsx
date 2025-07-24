@@ -9,7 +9,7 @@ import "../index.css";
 import { Tooltip, Button } from "@material-tailwind/react";
 const Header = ({ isModalOpen, setIsModalOpen }) => {
   const username = useSelector((state) => state.auth.userData.name);
-  const profileSrc = null || useSelector((state) => state.auth.userData.profile);
+  const profileSrc = null || useSelector((state) => state.auth.userData.profileSource);
   const dispatch = useDispatch();
   let [isNavHidden, setIsNavHidden] = useState(true);
   let navItems = [
@@ -79,8 +79,6 @@ const Header = ({ isModalOpen, setIsModalOpen }) => {
             className=" capitalize font-medium z-20 text-[var(--brand-color)] bg-white"
           >
             <Button
-              disableRipple
-              disableFocusRipple
               sx={{
                 "&:focus": {
                   backgroundColor: "transparent",
@@ -112,7 +110,7 @@ const Header = ({ isModalOpen, setIsModalOpen }) => {
                 id="profile"
                 className="min-h-8 min-w-8 lg:h-12 lg:w-12 flex justify-center items-center  rounded-[50%] overflow-hidden"
               >
-                {profileSrc !== "" ? (
+                {profileSrc !=null ? (
                   <img
                     className="h-8 w-8 lg:h-12 lg:w-12"
                     src={profileSrc}

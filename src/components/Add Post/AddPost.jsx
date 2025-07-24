@@ -7,14 +7,19 @@ import postServices from "../../../services/Post";
 import { useDispatch, useSelector } from "react-redux";
 import { refresh } from "../../../store/refresh/refreshSlice";
 import { motion } from "motion/react";
-import {BlinkBlur} from 'react-loading-indicators'
+import { BlinkBlur } from "react-loading-indicators";
+
 const AddPost = ({ isModalOpen, setIsModalOpen }) => {
   const dispatch = useDispatch();
   let [inputMedia, setInputMedia] = useState("");
   let [caption, setCaption] = useState("");
   let [isLoading, setIsLoading] = useState(false);
+
   const userId = useSelector((state) => state.auth.userData.userId);
   const status = useSelector((state) => state.auth.userStatus);
+  const authorName = useSelector((state) => state.auth.userData.name);
+  const authorUserName = useSelector((state) => state.auth.userData.userName);
+  const authorProfileURL = useSelector((state) => state.auth.userData.profileSource);
   const handleMedia = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -26,13 +31,22 @@ const AddPost = ({ isModalOpen, setIsModalOpen }) => {
   };
 
   const addPost = () => {
-    if (!status || !inputMedia || !caption || !userId) {
-      toast.error("Upload the picture with caption",{
-        autoClose:4000
+    if (!status || !userId) {
+      toast.error("Something went wrong, please login again.", {
+        autoClose: 4000,
       });
       return;
     }
+
+    if (!inputMedia) {
+      toast.error("Please upload the picture.", {
+        autoClose: 4000,
+      });
+      return;
+    }
+
     setIsLoading((prev) => !prev);
+
     storageServices
       .uploadFile(inputMedia)
       .then((file) => {
@@ -41,23 +55,24 @@ const AddPost = ({ isModalOpen, setIsModalOpen }) => {
           .addPost({
             caption,
             imageUrl,
-            userId,
             status,
+            userId,
+            authorName,
+            authorUserName,
+            authorProfileURL,
           })
           .then(() => {
             setIsLoading((prev) => !prev);
-            toast.success("Post Uploaded");
             setCaption("");
             setInputMedia("");
             setIsModalOpen((prev) => !prev);
+            toast.success("Post Uploaded");
+            document.getElementById("preview").style.background = "none";
             dispatch(refresh());
-            document.getElementById(
-              "preview"
-            ).style.background = 'none';
           })
-          .catch((err) => toast.error(err,{autoClose:4000}));
+          .catch((err) => toast.error(err, { autoClose: 4000 }));
       })
-      .catch((err) => toast.error(err,{autoClose:4000}));
+      .catch((err) => toast.error(err, { autoClose: 4000 }));
   };
 
   useEffect(() => {
@@ -90,7 +105,11 @@ const AddPost = ({ isModalOpen, setIsModalOpen }) => {
             type:'tween',
           }}
         ></motion.div> */}
-        <BlinkBlur color={["#000000", "#082828", "#115252", "#1a7c7c"]} text='Showcasing your picture to the world' textColor="white" />
+        <BlinkBlur
+          color={["#000000", "#082828", "#115252", "#1a7c7c"]}
+          text="Showcasing your picture to the world"
+          textColor="white"
+        />
       </div>
       <button
         onClick={(e) => setIsModalOpen((prev) => !prev)}

@@ -15,12 +15,19 @@ import { useEffect } from "react";
 import postServices from "../services/Post";
 import { addBatch } from "../store/Post/PostSlice";
 function App() {
-  const refresh  = useSelector((state)=>state.refresh)
+  const refresh = useSelector((state) => state.refresh);
   const dispatch = useDispatch();
   const fetchPosts = async (cursorDocumentID) => {
-    const result = (await postServices.getPostBatch(cursorDocumentID))
-      .documents;
-    dispatch(addBatch(result));
+    const post = (await postServices.getPostBatch(cursorDocumentID)).documents;
+    const metaPost = await postServices.getMetaPostBatch(post);
+    const POST = post.map((post) => {
+      const meta = metaPost.documents.find((m) => m.postId == post.$id);
+      return {
+        data:post ,
+        metaData: meta || {},
+      };
+    });
+    dispatch(addBatch(POST));
     return;
   };
   useEffect(() => {
@@ -42,7 +49,6 @@ function App() {
         { path: "/verify", element: <Verification /> },
         { path: "/auth", element: <Authentication /> },
         { path: "*", element: <Navigate to="/" /> },
-
       ],
     },
   ]);

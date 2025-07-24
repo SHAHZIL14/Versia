@@ -23,9 +23,10 @@ const AuthWatcher = () => {
           userServices.getUserInfo(user.$id).then((userDoc) => {
             dispatch(
               logIn({
-                name: userDoc.username,
+                name: userDoc.name,
+                userName:userDoc.username,
                 userId: user.$id,
-                profile: userDoc.profileSource,
+                profileSource: userDoc.profileSource,
               })
             );
             if (location.pathname === "/auth") {

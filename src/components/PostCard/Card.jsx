@@ -2,15 +2,7 @@ import CardHeader from "./CardHeader";
 import { Heart, MessageCircle, Share } from "lucide-react";
 import { useState } from "react";
 import { motion } from "motion/react";
-function Card({
-  caption,
-  image,
-  likes = 0,
-  comments = 0,
-  authorName,
-  authorUsername,
-  authorProfileURL,
-}) {
+function Card({data , metaData}) {
   let [isLiked, setIsLiked] = useState(false);
   return (
     <motion.div
@@ -26,14 +18,14 @@ function Card({
     >
       {/* card Header */}
       <CardHeader
-        authorName={authorName}
-        authorUserName={authorUsername}
-        authorProfileURL={authorProfileURL}
+        authorName={metaData.authorName}
+        authorUserName={metaData.authorUserName}
+        authorProfileURL={metaData.authorProfileURL}
       />
       <div className=""></div>
       <div className="featuredImage overflow-hidden flex justify-center items-center  bg-contain bg-no-repeat bg-center lg:rounded  h-fit w-full  ">
         <img
-          src={image}
+          src={data.imageUrl}
           className="object-center object-cover lg:rounded"
           alt=""
         />
@@ -56,14 +48,14 @@ function Card({
         </div>
         <div className="action-data text-black flex gap-x-3  px-2">
           <div>
-            <strong>{likes.toString()} </strong>likes
+            <strong>{metaData.likes.toString()} </strong>likes
           </div>
           <div>
-            <strong>{comments.toString()} </strong> comments
+            <strong>{metaData.comments.toString()} </strong> comments
           </div>
         </div>
         <div className="caption text-black px-2 pb-5">
-          <p className="text-sm lg:text-base ">{caption}</p>
+          <p className="text-sm lg:text-base ">{data.caption}</p>
         </div>
       </div>
     </motion.div>

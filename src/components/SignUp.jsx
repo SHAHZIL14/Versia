@@ -59,8 +59,9 @@ const SignUp = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
                   dispatch(
                     logIn({
                       name: userDoc.name,
+                      userName:userDoc.username,
                       userId: user.$id,
-                      profile: userDoc.profileSource,
+                      profileSource: userDoc.profileSource,
                     })
                   );
                   authService
