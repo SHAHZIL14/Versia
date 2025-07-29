@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { logIn } from "../../store/authentication/authenticationSlice";
 import { useDispatch } from "react-redux";
 import userServices from "../../services/User";
-import { useNavigate } from "react-router-dom";
+import { motion } from "motion/react";
 
 const SignUp = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
   let [profileInput, setProfileInput] = useState(null);
@@ -59,7 +59,7 @@ const SignUp = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
                   dispatch(
                     logIn({
                       name: userDoc.name,
-                      userName:userDoc.username,
+                      userName: userDoc.username,
                       userId: user.$id,
                       profileSource: userDoc.profileSource,
                     })
@@ -86,7 +86,12 @@ const SignUp = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
   };
 
   return (
-    <div className="">
+    <motion.div
+      whileInView={{ opacity: 1 }}
+      initial={{ opacity: 0 }}
+      transition={{ duration: 0.5 }}
+      viewport={{ once: true }}
+    >
       <video
         autoPlay
         muted
@@ -94,7 +99,10 @@ const SignUp = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
         playsInline
         className="absolute lg:-top-20 muted brightness-[20%]  -left-0 w-full h-full  lg:w-[140%] lg:h-[140%]  object-cover"
       >
-      <source src="https://res.cloudinary.com/ddoxcrq4q/video/upload/v1753309978/signUp_kwtab9.mp4" type="video/mp4"/>  
+        <source
+          src="https://res.cloudinary.com/ddoxcrq4q/video/upload/v1753309978/signUp_kwtab9.mp4"
+          type="video/mp4"
+        />
       </video>
       <div
         className={`${
@@ -127,6 +135,7 @@ const SignUp = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
               className=" border-[var(--brand-color)] border-2 cursor-pointer  bg-cover bg-center flex justify-center items-center  w-24 h-24 rounded-[50%] text-center  bg-[var(--brand-color)] text-white  focus:outline-none focus:border-none focus:ring-0 overflow-hidden"
             >
               <img
+                loading="lazy-loading"
                 id="profilePic"
                 className={`${
                   profileInput ? "" : "hidden"
@@ -237,14 +246,14 @@ const SignUp = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
         <span className="text-white">
           Already registered?,{" "}
           <span
-            className="cursor-pointer font-bold text-[#089999]  "
+            className="cursor-pointer font-bold text-[var(--brand-color)]   "
             onClick={() => setIsUserNew((prev) => !prev)}
           >
             LogIn
           </span>
         </span>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

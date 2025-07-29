@@ -15,7 +15,9 @@ const AuthWatcher = () => {
   const navigate = useNavigate();
   const location = useLocation();
   let [refreshKey,setRefreshKey] = useState(0);
+  const userId = useSelector((state)=>state.auth.userData.userId);
   useEffect(() => {
+  if(userId) return ;
     authService
       .getUser()
       .then((user) => {
@@ -27,19 +29,20 @@ const AuthWatcher = () => {
                 userName:userDoc.username,
                 userId: user.$id,
                 profileSource: userDoc.profileSource,
+                userBio:userDoc.userBio
               })
             );
             if (location.pathname === "/auth") {
               navigate("/home");
             }
-            setTimeout(() => dispatch(setLoading(false)), 1000);
+            dispatch(setLoading(false));
           });
         } else {
           dispatch(logOut());
           if (location.pathname !== "/auth") {
             navigate("/auth");
           }
-          setTimeout(() => dispatch(setLoading(false)), 1000);
+          dispatch(setLoading(false));
         }
       })
       .catch((error) => {

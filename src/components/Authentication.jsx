@@ -33,7 +33,7 @@ const Authentication = () => {
                 isUserNew ? "translate-x-full opacity-0" : "flex"
               } bg-gradient-to-bl from-black/50 to-[var(--brand-color)] text-white text-3xl flex justify-center items-center  absolute top-0 left-0`}
             >
-             <img className="h-15" src='/versia.png'/>
+             <img loading="lazy-loading" className="h-15" src='/versia.png'/>
             </div>
           </div>
           <div
@@ -50,7 +50,7 @@ const Authentication = () => {
                 isUserNew ? "flex" : "-translate-x-full opacity-0"
               } bg-gradient-to-br from-black/50 to-[var(--brand-color)] text-white text-3xl flex justify-center items-center  absolute top-0 right-0`}
             >
-              <img src="/versia.png" className="h-15" alt="" />
+              <img loading="lazy-loading" src="/versia.png" className="h-15" alt="" />
             </div>
           </div>
         </div>

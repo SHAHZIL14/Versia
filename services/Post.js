@@ -16,17 +16,17 @@ class PostServices {
                 config.postCollectionID,
                 ID.unique(),
                 {
-                    'caption': caption,
-                    'imageUrl': imageUrl,
+                    'authorId': userId,
+                    'imageURL': imageUrl,
                     'status': status,
-                    'authorId': userId
+                    'caption': caption,
                 }
             );
-            
+
             const postData = await this.database.createDocument(
                 config.databaseID,
                 config.postMetaCollectionID,
-                ID.unique(),
+                post.$id,
                 {
                     'authorName': authorName,
                     'authorUserName': authorUserName,
@@ -49,6 +49,35 @@ class PostServices {
                 config.postCollectionID,
                 postId
             );
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getMetaPost(postId) {
+        try {
+            const metaPost = await this.database.getDocument(
+                config.databaseID,
+                config.postMetaCollectionID,
+                postId
+            )
+            return metaPost;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getIsLiked(postId, userId) {
+        try {
+            const getIsLiked = await this.database.listDocuments(
+                config.databaseID,
+                config.postLikesCollectionID,
+                [
+                    Query.equal('postId', postId),
+                    Query.equal('userId', userId),
+                ]
+            );
+            return getIsLiked;
         } catch (error) {
             throw error;
         }
@@ -77,6 +106,82 @@ class PostServices {
             return metaPost;
         } catch (error) {
 
+        }
+    }
+
+    async getPostLikesBatch(postIdBatch, userId) {
+        try {
+
+            if (postIdBatch.length == 0 || !userId) {
+                return;
+            };
+            const result = await this.database.listDocuments(
+                config.databaseID,
+                config.postLikesCollectionID,
+                [
+                    Query.equal('postId', postIdBatch),
+                    Query.equal('userId', userId)
+                ]
+            );
+            return result;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async likePost(postId, postMetaId, userId, currentLikes) {
+        try {
+            const likeDocument = await this.database.createDocument(
+                config.databaseID,
+                config.postLikesCollectionID,
+                ID.unique(),
+                {
+                    postId: postId,
+                    userId: userId
+                }
+            );
+            const like = await this.database.updateDocument(
+                config.databaseID,
+                config.postMetaCollectionID,
+                postMetaId,
+                {
+                    likes: currentLikes + 1
+                }
+            );
+            return like;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async unlikePost(postId, postMetaId, userId, currentLikes) {
+        try {
+            const idToDelete = (await this.database.listDocuments(
+                config.databaseID,
+                config.postLikesCollectionID,
+                [
+                    Query.equal('postId', postId),
+                    Query.equal('userId', userId)
+                ]
+            )).documents[0].$id;
+
+            const deleteDoc = await this.database.deleteDocument(
+                config.databaseID,
+                config.postLikesCollectionID,
+                idToDelete
+            );
+
+            const unlike = await this.database.updateDocument(
+                config.databaseID,
+                config.postMetaCollectionID,
+                postMetaId,
+                {
+                    likes: currentLikes - 1
+                }
+            );
+            return unlike;
+        } catch (error) {
+            throw error;
         }
     }
 }

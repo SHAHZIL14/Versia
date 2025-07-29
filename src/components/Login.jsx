@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import userServices from "../../services/User";
 import { ThreeDot } from "react-loading-indicators";
+import { motion } from 'motion/react'
 const Login = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
   const dispatch = useDispatch();
   const navigateTo = useNavigate();
@@ -79,7 +80,12 @@ const Login = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
   };
 
   return (
-    <div>
+    <motion.div
+    whileInView={{ opacity: 1 }}
+      initial={{ opacity: 0 }}
+      transition={{ duration: 0.5}}
+      viewport={{ once: true }} 
+    >
       <video
         autoPlay
         muted
@@ -135,14 +141,14 @@ const Login = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
         <span className=" text-white">
           New user?{" "}
           <span
-            className="cursor-pointer font-bold text-[#089999]  "
+            className="cursor-pointer font-bold text-[var(--brand-color)] "
             onClick={() => setIsUserNew((prev) => !prev)}
           >
             Register
           </span>
         </span>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

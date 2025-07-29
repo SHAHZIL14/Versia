@@ -1,4 +1,4 @@
-import { Client, Databases, ID } from "appwrite";
+import { Client, Databases, ID, Query } from "appwrite";
 import config from "../src/config/config";
 import storageServices from "./Storage";
 class UserSevices {
@@ -14,7 +14,7 @@ class UserSevices {
         try {
             let profileSource = ''
             if (profilePicFile) {
-            profileSource = storageServices.getFileView((await storageServices.uploadFile(profilePicFile)).$id);
+                profileSource = storageServices.getFileView((await storageServices.uploadFile(profilePicFile)).$id);
             }
 
             return await this.database.createDocument(
@@ -47,6 +47,31 @@ class UserSevices {
         }
 
     }
+
+    async getUserPosts(userId) {
+        return await this.database.listDocuments(
+            config.databaseID,
+            config.postCollectionID,
+            [Query.equal('authorId', userId)]
+        );
+    }
+
+    async updateUserBio(bio, userDataId) {
+        try {
+            const updateBio = await this.database.updateDocument(
+                config.databaseID,
+                config.userCollectionID,
+                userDataId,
+                {
+                    userBio: bio
+                }
+            );
+            return updateBio;
+        } catch (error) {
+            throw error
+        }
+    }
+
 }
 
 const userServices = new UserSevices();

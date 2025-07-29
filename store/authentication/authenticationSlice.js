@@ -20,10 +20,13 @@ const authenticationSlice = createSlice({
         },
         setLoading: function (state, action) {
             state.loading = action.payload;
+        },
+        updateBio: function (state, action) {
+            state.userData.userBio = action.payload;
         }
     }
 });
 
-export const { logIn, logOut, setLoading } = authenticationSlice.actions;
+export const { logIn, logOut, setLoading,updateBio } = authenticationSlice.actions;
 
 export default authenticationSlice.reducer;
