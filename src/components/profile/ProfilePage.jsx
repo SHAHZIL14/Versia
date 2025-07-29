@@ -168,7 +168,7 @@ function ProfilePage({ mode }) {
         {userData.userPosts?.map((eachPost) => (
           <motion.div
             key={eachPost.$id}
-            className="hover:brightness-75 cursor-pointer post overflow-hidden h-48 lg:h-96 lg:w-full"
+            className="hover:brightness-75 cursor-pointer post overflow-hidden h-60 lg:h-96 lg:w-full"
           >
             <img
               onClick={() => {
