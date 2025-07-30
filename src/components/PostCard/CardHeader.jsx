@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Check } from "lucide-react";
-import { useFetcher, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Toastify from "toastify-js";
 import "toastify-js/src/toastify.css";
 import { useSelector } from "react-redux";
+import { ThreeDot } from "react-loading-indicators";
 
 function CardHeader({
   authorId,
@@ -12,37 +13,53 @@ function CardHeader({
   authorProfileURL,
 }) {
   let [isFollowing, setIsFollowing] = useState(false);
+  const [loading, setLoading] = useState(false);
   const userId = useSelector((state) => state.auth.userData.userId);
-  const fetcher = useFetcher();
+  const location = useLocation();
   const navigate = useNavigate();
   return (
     <>
       <div className="w-full  rounded-t-2xl flex gap-3 items-center justify-between bg-gray-40 px-2 py-2 ">
-        <div className="flex gap-2 items-center">
+        {loading ? (
+          <ThreeDot
+            color={['var(--brand-color)']}
+            size="small"
+          />
+        ) : (
           <div
             onClick={() => {
+              setLoading(true);
               if (userId == authorId) {
                 navigate("/profile");
               } else {
                 navigate(`/user/${authorId}`);
               }
+              if (
+                location.pathname.includes("/profile") ||
+                location.pathname.includes("/user")
+              ) {
+                setLoading(false);
+              }
             }}
-            className="cursor-pointer profile h-10 w-10 rounded-[50%] overflow-hidden border border-black"
+            className="flex gap-2 items-center cursor-pointer"
           >
-            {authorProfileURL && (
-              <img
-                loading="lazy-loading"
-                src={authorProfileURL}
-                alt="Profile"
-                className="rounded-lg w-full h-full object-cover object-center"
-              />
-            )}
+            <div className="cursor-pointer profile h-10 w-10 rounded-[50%] overflow-hidden border border-black">
+              {authorProfileURL && (
+                <img
+                  loading="lazy-loading"
+                  src={authorProfileURL}
+                  alt="Profile"
+                  className="rounded-lg w-full h-full object-cover object-center"
+                />
+              )}
+            </div>
+            <div className="about-author flex flex-col  justify-center text-black">
+              <span className="text-sm/tight font-medium">{authorName}</span>
+              <span className="text-xs">{`@${authorUserName}`}</span>
+            </div>
           </div>
-          <div className="about-author flex flex-col  justify-center text-black">
-            <span className="text-sm/tight font-medium">{authorName}</span>
-            <span className="text-xs">{`@${authorUserName}`}</span>
-          </div>
-        </div>
+        )}
+
         <div
           className={`following-button ${authorId == userId ? "hidden" : ""}  ${
             isFollowing

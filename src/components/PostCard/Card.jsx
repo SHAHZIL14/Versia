@@ -138,7 +138,7 @@ function Card({ data, mode }) {
       initial={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
       viewport={{ once: true }}
-      className={`${mode=='specific'?'min-h-screen':'h-fit'} w-full flex-col flex  text-xs md:text-sm lg:text-md   mx-auto overflow-hidden  border-blue-80 bg-white  py-0`}
+      className={`${mode=='specific'?'min-h-screen w-screen':'h-fit'} w-full flex-col flex  text-xs md:text-sm lg:text-md   mx-auto overflow-hidden  border-blue-80 bg-white  py-0`}
     >
       <CardHeader
         authorId={postData.authorId}
@@ -154,7 +154,7 @@ function Card({ data, mode }) {
           setShowDoubleTapHeart(true);
           setTimeout(() => setShowDoubleTapHeart(false), 800); // heart disappears
         }}
-        className="relative featuredImage cursor-pointer overflow-hidden flex justify-center items-center bg-contain bg-no-repeat bg-center lg:rounded h-fit w-full"
+        className={`${mode=='specific'?'max-h-[75vh]':'max-h-[400px]'} relative featuredImage cursor-pointer overflow-hidden flex justify-center items-center bg-contain bg-no-repeat bg-center lg:rounded h-fit lg:max-h-auto w-full`}
       >
         {postData.imageURL && (
           <img

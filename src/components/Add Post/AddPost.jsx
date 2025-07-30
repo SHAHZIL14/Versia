@@ -71,7 +71,7 @@ const AddPost = () => {
             toast.success("Post Uploaded");
             document.getElementById("preview").style.background = "none";
             dispatch(changeIsFetched(false));
-            navigate(-1);
+            navigate('/home');
           })
           .catch((err) => toast.error(err, { autoClose: 4000 }));
       })
