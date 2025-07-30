@@ -11,9 +11,10 @@ const Authentication = () => {
       <div
         className={`${
           authLoading ? "" : "hidden"
-        } fixed top-0 z-[1000] left-0 muted bg-[var(--brand-color)] w-screen h-full object-cover flex justify-center items-center`}
+        } fixed top-0 z-[1000] left-0 muted bg-[var(--brand-color)] w-screen h-full object-cover flex flex-col gap-3 justify-center items-center`}
       >
-        <ThreeDot color="white" textColor="white" text={`Teleporting you into the app...`} />
+        <ThreeDot color="white" textColor="white"  />
+        <p className="font-bold text-xs md:text-md tracking-wider uppercase">Teleporting you into the app</p>
       </div>
       <div
         id="container-auth"

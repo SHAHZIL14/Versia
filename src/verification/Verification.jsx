@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { Check } from "lucide-react";
 const Verification = () => {
   const navigate = useNavigate();
-  const [verified, setVerified] = useState(null); 
+  const [verified, setVerified] = useState(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -15,7 +15,7 @@ const Verification = () => {
 
     if (!userId || !secret) {
       toast.error("Invalid Link");
-      setVerified(false); 
+      setVerified(false);
       setTimeout(() => navigate("/auth"), 2000);
       return;
     }
@@ -37,7 +37,7 @@ const Verification = () => {
   }, []);
 
   return (
-    <div className="w-screen h-screen flex justify-center items-center bg-[var(--brand-color)] fixed top-0 left-0">
+    <div className="w-screen h-screen flex flex-col justify-center items-center bg-[var(--brand-color)] fixed top-0 left-0">
       {verified === true ? (
         <div className="flex flex-col items-center gap-2 text-white">
           <p>✅ Verified</p>
@@ -48,15 +48,19 @@ const Verification = () => {
           <p>❌ Verification Failed</p>
         </div>
       ) : (
-        <ThreeDot
-          color={["#cccccc", "#e6e6e6", "#ffffff", "#ffffff"]}
-          text="Please wait, verifying you..."
-          textColor="white"
-        />
+        <>
+          <ThreeDot
+            color={["#cccccc", "#e6e6e6", "#ffffff", "#ffffff"]}
+            text="Please wait, verifying you..."
+            textColor="white"
+          />
+          <p className="font-bold text-xs md:text-md tracking-wider uppercase">
+            Please wait, verifying you...
+          </p>
+        </>
       )}
     </div>
   );
 };
-
 
 export default Verification;

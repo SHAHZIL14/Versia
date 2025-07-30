@@ -131,6 +131,7 @@ class PostServices {
 
     async likePost(postId, postMetaId, userId, currentLikes) {
         try {
+            console.log(postId, postMetaId, userId, currentLikes);
             const likeDocument = await this.database.createDocument(
                 config.databaseID,
                 config.postLikesCollectionID,
@@ -156,6 +157,7 @@ class PostServices {
 
     async unlikePost(postId, postMetaId, userId, currentLikes) {
         try {
+            console.log(postId, postMetaId, userId, currentLikes);
             const idToDelete = (await this.database.listDocuments(
                 config.databaseID,
                 config.postLikesCollectionID,
