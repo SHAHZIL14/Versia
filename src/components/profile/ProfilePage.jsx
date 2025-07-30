@@ -59,13 +59,13 @@ function ProfilePage({ mode }) {
     setEditable((prev) => !prev);
     setBioLoading(true);
     userServices
-      .updateUserBio(bio, currentUserData.userId)
+      .updateUserBio(bio, currentUserData.userId )
       .then(() => {
         console.log("successfully updated bio");
         dispatch(updateBio(bio));
         setBioLoading(false);
       })
-      .then(() => {
+      .catch(() => {
         console.log("failed updating bio");
         setBioLoading(false);
       });
@@ -138,10 +138,19 @@ function ProfilePage({ mode }) {
                   </>
                 ) : (
                   <>
-                    <Edit
-                      className="h-4 w-4 lg:h-5 cursor-pointer lg:w-5"
-                      onClick={() => setEditable((prev) => !prev)}
-                    />
+                    {mode == "current" ? (
+                      <Edit
+                        className="h-4 w-4 lg:h-5 cursor-pointer lg:w-5"
+                        onClick={() => setEditable((prev) => !prev)}
+                      />
+                    ) : (
+                      currentUserData.userId == loaderData.userId && (
+                        <Edit
+                          className="h-4 w-4 lg:h-5 cursor-pointer lg:w-5"
+                          onClick={() => setEditable((prev) => !prev)}
+                        />
+                      )
+                    )}
                   </>
                 )}
               </span>
@@ -201,5 +210,6 @@ export const userInfoLoader = async ({ params }) => {
     profileURL: userInfo.profileSource,
     name: userInfo.name,
     username: userInfo.username,
+    userBio: userInfo.userBio,
   };
 };

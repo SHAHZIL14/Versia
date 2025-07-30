@@ -13,7 +13,7 @@ function CardHeader({
 }) {
   let [isFollowing, setIsFollowing] = useState(false);
   let [notified, setNotified] = useState(false);
-  const userId = useSelector((state)=>state.auth.userData.userId);
+  const userId = useSelector((state) => state.auth.userData.userId);
   const fetcher = useFetcher();
   const navigate = useNavigate();
   return (
@@ -21,8 +21,13 @@ function CardHeader({
       <div className="w-full  rounded-t-2xl flex gap-3 items-center justify-between bg-gray-40 px-2 py-2 ">
         <div className="flex gap-2 items-center">
           <div
-            onMouseEnter={() => fetcher.load(`/user/${authorId}`)}
-            onClick={() => navigate(`/user/${authorId}`)}
+            onClick={() => {
+              if (userId == authorId) {
+                navigate("/profile");
+              } else {
+                navigate(`/user/${authorId}`);
+              }
+            }}
             className="cursor-pointer profile h-10 w-10 rounded-[50%] overflow-hidden border border-black"
           >
             {authorProfileURL && (
@@ -40,14 +45,15 @@ function CardHeader({
           </div>
         </div>
         <div
-          className={`following-button ${authorId==userId?'hidden':''}  ${
+          className={`following-button ${authorId == userId ? "hidden" : ""}  ${
             isFollowing
               ? "bg-white  text-[var(--brand-color)] font-medium"
               : "bg-[var(--brand-color)]"
           }  py-1 px-2 text-sm rounded-lg cursor-pointer `}
         >
           <button
-            className={`cursor-pointer transition-all ease-in-out duration-100 flex items-center gap-px`}        onClick={() => {
+            className={`cursor-pointer transition-all ease-in-out duration-100 flex items-center gap-px`}
+            onClick={() => {
               setIsFollowing((prev) => !prev);
               if (!notified) {
                 Toastify({
