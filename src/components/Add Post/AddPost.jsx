@@ -7,15 +7,20 @@ import postServices from "../../../services/Post";
 import { useDispatch, useSelector } from "react-redux";
 import { refresh } from "../../../store/refresh/refreshSlice";
 import { changeIsFetched } from "../../../store/Post/PostSlice";
-import { BlinkBlur } from "react-loading-indicators";
+import { BlinkBlur, ThreeDot } from "react-loading-indicators";
 import { useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
+import heic2any from "heic2any";
+import imageCompression from "browser-image-compression";
+
 const AddPost = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   let [inputMedia, setInputMedia] = useState("");
+  let [mediaURL, setMediaURL] = useState("");
   let [caption, setCaption] = useState("");
   let [isLoading, setIsLoading] = useState(false);
+  let [isMediaLoading, setIsMediaLoading] = useState(false);
   const userId = useSelector((state) => state.auth.userData.userId);
   const status = useSelector((state) => state.auth.userStatus);
   const authorName = useSelector((state) => state.auth.userData.name);
@@ -23,15 +28,74 @@ const AddPost = () => {
   const authorProfileURL = useSelector(
     (state) => state.auth.userData.profileSource
   );
-  const handleMedia = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setInputMedia(file);
-      document.getElementById(
-        "preview"
-      ).style.backgroundImage = `url(${URL.createObjectURL(file)})`;
+
+const handleMedia = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  setIsMediaLoading(true);
+
+  const fileExt = file.name.split(".").pop().toLowerCase();
+
+  try {
+    let finalBlob;
+
+    if (fileExt === "heic") {
+      console.log("HEIC entered");
+      finalBlob = await heic2any({
+        blob: file,
+        toType: "image/jpeg",
+        quality: 0.7,
+      });
+    } else if (fileExt === "jpeg" || fileExt === "jpg") {
+      console.log("JPEG/JPG entered");
+      finalBlob = file; // Already valid
+    } else {
+      console.log("OTHER image entered");
+      const options = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+        fileType: "image/jpeg",
+        initialQuality: 0.7,
+      };
+      finalBlob = await imageCompression(file, options);
     }
-  };
+
+    
+    const appwriteFile = new File(
+      [finalBlob],
+      `media-${Date.now()}.jpg`, 
+      { type: "image/jpeg" }
+    );
+
+    const previewURL = URL.createObjectURL(appwriteFile);
+    const imgCheck = new Image();
+
+    imgCheck.onload = () => {
+      setInputMedia(appwriteFile); 
+      setMediaURL(previewURL);
+      setIsMediaLoading(false);
+    };
+
+    imgCheck.onerror = () => {
+      URL.revokeObjectURL(previewURL);
+      toast.error("Invalid image file, please upload another one.");
+      setInputMedia("");
+      setMediaURL("");
+      setIsMediaLoading(false);
+    };
+
+    imgCheck.src = previewURL;
+  } catch (error) {
+    console.error("Image upload error:", error);
+    toast.error("Error uploading photo!");
+    setInputMedia("");
+    setMediaURL("");
+    setIsMediaLoading(false);
+  }
+};
+
 
   const addPost = () => {
     if (!status || !userId) {
@@ -71,7 +135,7 @@ const AddPost = () => {
             toast.success("Post Uploaded");
             document.getElementById("preview").style.background = "none";
             dispatch(changeIsFetched(false));
-            navigate('/home');
+            navigate("/home");
           })
           .catch((err) => toast.error(err, { autoClose: 4000 }));
       })
@@ -122,7 +186,17 @@ const AddPost = () => {
         onClick={() => document.getElementById("inputFile").click()}
         className={` bg-cover bg-center bg-[var(--brand-color)]/20 h-60 w-72 lg:h-96 lg:w-[30%] rounded-lg cursor-pointer overflow-hidden flex justify-center items-center p-0 right-0  relative `}
       >
-        {inputMedia ? "" : <ImagePlus className={`h-10 w-10 text-white`} />}
+        {isMediaLoading ? (
+          <ThreeDot color={"white"} size="small" />
+        ) : inputMedia ? (
+          <img
+            src={mediaURL}
+            alt="preview"
+            className="object-cover object-center h-full w-full"
+          />
+        ) : (
+          <ImagePlus className={`h-10 w-10 text-white`} />
+        )}
       </div>
       <textarea
         className={`resize-none text-white h-16 w-full lg:h-24 lg:w-80 focus:outline-0 p-3 rounded-lg  `}

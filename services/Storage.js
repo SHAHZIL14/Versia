@@ -21,6 +21,7 @@ class StorageService {
     }
 
     async uploadFile(file) {
+        console.log("uploaded file = ", file);
         try {
             return await this.storage.createFile(
                 config.bucketID,
@@ -41,7 +42,7 @@ class StorageService {
 
     }
 
-    getFileView( fileId) {
+    getFileView(fileId) {
         try {
             return this.storage.getFileView(config.bucketID, fileId);
         } catch (error) {

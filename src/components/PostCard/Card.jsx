@@ -154,13 +154,13 @@ function Card({ data, mode }) {
           setShowDoubleTapHeart(true);
           setTimeout(() => setShowDoubleTapHeart(false), 800); // heart disappears
         }}
-        className={`${mode=='specific'?'max-h-[75vh]':'max-h-[400px]'} relative featuredImage cursor-pointer overflow-hidden flex justify-center items-center bg-contain bg-no-repeat bg-center lg:rounded h-fit lg:max-h-auto w-full`}
+        className={`${mode=='specific'?'max-h-[75vh]':'max-h-[500px]'} relative featuredImage cursor-pointer overflow-hidden flex justify-center items-center bg-contain bg-no-repeat bg-center lg:rounded h-fit lg:max-h-auto w-full`}
       >
         {postData.imageURL && (
           <img
             loading="lazy-loading"
             src={postData.imageURL}
-            className="object-center object-cover lg:rounded"
+            className="w-full max-h-[500px] object-cover object-top"
             alt=""
           />
         )}

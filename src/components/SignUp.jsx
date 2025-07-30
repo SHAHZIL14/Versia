@@ -6,11 +6,15 @@ import { logIn } from "../../store/authentication/authenticationSlice";
 import { useDispatch } from "react-redux";
 import userServices from "../../services/User";
 import { motion } from "motion/react";
-
+import heic2any from "heic2any";
+import imageCompression from "browser-image-compression";
+import { Commet, ThreeDot } from "react-loading-indicators";
 const SignUp = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
   let [profileInput, setProfileInput] = useState(null);
   let [profile, setProfile] = useState("Add Profile");
+  let [profilePreview, setProfilePreview] = useState("");
   let [hasWarned, setHasWarned] = useState(false);
+  let [previewLoading, setPreviewLoading] = useState(false);
   const dispatch = useDispatch();
   const {
     register,
@@ -21,12 +25,72 @@ const SignUp = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
   } = useForm({
     mode: "all",
   });
-  const handleProfile = (event) => {
+
+  const handleProfile = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
-    setProfileInput(file);
-    document.getElementById("profilePic").src = `${URL.createObjectURL(file)}`;
+  
+    const fileExt = file.name.split(".").pop().toLowerCase();
+    setPreviewLoading(true);
+  
+    try {
+      let finalBlob;
+  
+      if (fileExt === "heic") {
+        console.log("HEIC entered");
+        finalBlob = await heic2any({
+          blob: file,
+          toType: "image/jpeg",
+          quality: 0.7,
+        });
+      } else if (fileExt === "jpeg" || fileExt === "jpg") {
+        console.log("JPEG/JPG entered");
+        finalBlob = file; 
+      } else {
+        console.log("OTHER image entered");
+        const options = {
+          maxSizeMB: 1,
+          maxWidthOrHeight: 1920,
+          useWebWorker: true,
+          fileType: "image/jpeg",
+          initialQuality: 0.7,
+        };
+        finalBlob = await imageCompression(file, options);
+      }
+  
+      const appwriteCompatibleFile = new File(
+        [finalBlob],
+        "profile.jpg", 
+        { type: "image/jpeg" }
+      );
+  
+      const previewURL = URL.createObjectURL(appwriteCompatibleFile);
+      const imgCheck = new Image();
+  
+      imgCheck.onload = () => {
+        setProfileInput(appwriteCompatibleFile); // ✅ Now a valid File object
+        setProfilePreview(previewURL);
+        setPreviewLoading(false);
+      };
+  
+      imgCheck.onerror = () => {
+        URL.revokeObjectURL(previewURL);
+        toast.error("Invalid file, please upload a different one.");
+        setProfilePreview("");
+        setProfileInput("");
+        setPreviewLoading(false);
+      };
+  
+      imgCheck.src = previewURL;
+    } catch (error) {
+      console.error("File handling error:", error);
+      toast.error("Error occurred. Please upload your profile again.");
+      setProfilePreview("");
+      setProfileInput("");
+      setPreviewLoading(false);
+    }
   };
+
   const onSubmit = async ({ name, username, email, password }) => {
     if (!hasWarned && !profileInput) {
       toast.warn(
@@ -134,20 +198,30 @@ const SignUp = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
               }}
               className=" border-[var(--brand-color)] border-2 cursor-pointer  bg-cover bg-center flex justify-center items-center  w-24 h-24 rounded-[50%] text-center  bg-[var(--brand-color)] text-white  focus:outline-none focus:border-none focus:ring-0 overflow-hidden"
             >
-              <img
-                loading="lazy-loading"
-                id="profilePic"
-                className={`${
-                  profileInput ? "" : "hidden"
-                }  h-full w-full object-center object-cover `}
-              />
-              <span
-                className={`${profileInput ? "hidden" : ""} ${
-                  profile == "Add Profile" ? "" : " text-2xl"
-                }`}
-              >
-                {profile}
-              </span>
+              {previewLoading ? (
+                <ThreeDot size="small" color="white" />
+              ) : (
+                <>
+                  <img
+                    loading="lazy-loading"
+                    id="profilePic"
+                    src={profilePreview}
+                    alt="Unavailable"
+                    onLoad={() => console.log("✅ Image loaded successfully")}
+                    onError={(e) => console.error("❌ Failed to load image", e)}
+                    className={`${
+                      profileInput ? "" : "hidden"
+                    } text-xs h-full w-full object-center object-cover `}
+                  />
+                  <span
+                    className={`${profileInput ? "hidden" : ""} ${
+                      profile == "Add Profile" ? "" : " text-2xl"
+                    }`}
+                  >
+                    {profile}
+                  </span>
+                </>
+              )}
             </div>
           </div>
 
