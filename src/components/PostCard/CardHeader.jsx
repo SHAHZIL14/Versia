@@ -12,7 +12,6 @@ function CardHeader({
   authorProfileURL,
 }) {
   let [isFollowing, setIsFollowing] = useState(false);
-  let [notified, setNotified] = useState(false);
   const userId = useSelector((state) => state.auth.userData.userId);
   const fetcher = useFetcher();
   const navigate = useNavigate();
@@ -55,24 +54,21 @@ function CardHeader({
             className={`cursor-pointer transition-all ease-in-out duration-100 flex items-center gap-px`}
             onClick={() => {
               setIsFollowing((prev) => !prev);
-              if (!notified) {
-                Toastify({
-                  text: "Follow feature will be available soon",
-                  duration: 3000,
-                  gravity: "top",
-                  position: "right",
-                  style: {
-                    background: "var(--brand-color)",
-                    color: "#fff",
-                    borderRadius: "10px",
-                    boxShadow: "0 0 12px rgba(255,255,255,0.8)",
-                    fontWeight: "300",
-                    border: "1px solid var(--brand-color)",
-                    fontSize: "12px",
-                  },
-                }).showToast();
-                setNotified(true);
-              }
+              Toastify({
+                text: "Follow feature will be available soon",
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                style: {
+                  background: "var(--brand-color)",
+                  color: "#fff",
+                  borderRadius: "10px",
+                  boxShadow: "0 0 12px rgba(255,255,255,0.8)",
+                  fontWeight: "300",
+                  border: "1px solid var(--brand-color)",
+                  fontSize: "12px",
+                },
+              }).showToast();
             }}
           >
             <span className="inline-block transition-transform duration-200 scale-100">

@@ -12,6 +12,9 @@ import { ThreeDot, FourSquare } from "react-loading-indicators";
 import { motion } from "motion/react";
 import { Cross, Edit, Save, X } from "lucide-react";
 import { updateBio } from "../../../store/authentication/authenticationSlice";
+import Toastify from "toastify-js";
+import "toastify-js/src/toastify.css";
+
 function ProfilePage({ mode }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -59,7 +62,7 @@ function ProfilePage({ mode }) {
     setEditable((prev) => !prev);
     setBioLoading(true);
     userServices
-      .updateUserBio(bio, currentUserData.userId )
+      .updateUserBio(bio, currentUserData.userId)
       .then(() => {
         console.log("successfully updated bio");
         dispatch(updateBio(bio));
@@ -107,7 +110,26 @@ function ProfilePage({ mode }) {
             </div>
             {mode !== "current" &&
               currentUserData.userId !== loaderData.userId && (
-                <button className="text-xs lg:text-lg  uppercase bg-[var(--brand-color)] text-white w-36 py-1 rounded">
+                <button
+                  onClick={() => {
+                    Toastify({
+                      text: "Follow feature will be available soon",
+                      duration: 3000,
+                      gravity: "top",
+                      position: "right",
+                      style: {
+                        background: "var(--brand-color)",
+                        color: "#fff",
+                        borderRadius: "10px",
+                        boxShadow: "0 0 12px rgba(255,255,255,0.8)",
+                        fontWeight: "300",
+                        border: "1px solid var(--brand-color)",
+                        fontSize: "12px",
+                      },
+                    }).showToast();
+                  }}
+                  className="cursor-pointer text-xs lg:text-lg  uppercase bg-[var(--brand-color)] text-white w-36 py-1 rounded"
+                >
                   Follow
                 </button>
               )}
