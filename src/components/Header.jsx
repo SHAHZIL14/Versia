@@ -111,12 +111,12 @@ const Header = ({ options }) => {
                 navigate("/profile");
               }}
               id="profile"
-              className="min-h-9 min-w-9 lg:h-12 lg:w-12 flex justify-center items-center  rounded-[50%] overflow-hidden"
+              className="h-9 w-9 lg:h-12 lg:w-12 flex justify-center items-center  rounded-[50%] overflow-hidden"
             >
               {profileSrc != null ? (
                 <img
                   loading="lazy-loading"
-                  className="h-full w-full lg:h-12 lg:w-12"
+                  className="h-full w-full lg:h-12 lg:w-12 object-center object-cover"
                   src={profileSrc}
                 />
               ) : (
