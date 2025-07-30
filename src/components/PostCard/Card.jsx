@@ -89,7 +89,7 @@ function Card({ data, mode }) {
     setIsProcessing(true);
   
     if (isLiked) {
-      // UNLIKE logic
+
       const updatedLikes = likes - 1;
       setLikes(updatedLikes);
       setIsLiked(false);
@@ -97,10 +97,7 @@ function Card({ data, mode }) {
   
       try {
         const result = await postServices.unlikePost(postId, postData.postMetaId, userId, updatedLikes);
-        console.log("Successfully unliked", result);
       } catch (error) {
-        console.error("Unlike failed:", error);
-        // Rollback UI
         setLikes((prev) => prev + 1);
         setIsLiked(true);
         updatePostLikeCache(postId, likes, true);
@@ -109,7 +106,7 @@ function Card({ data, mode }) {
       }
   
     } else {
-      // LIKE logic
+
       const updatedLikes = likes + 1;
       setLikes(updatedLikes);
       setIsLiked(true);
@@ -117,10 +114,8 @@ function Card({ data, mode }) {
   
       try {
         const result = await postServices.likePost(postId, postData.postMetaId, userId, updatedLikes);
-        console.log("Successfully liked", result);
       } catch (error) {
         console.error("Like failed:", error);
-        // Rollback UI
         setLikes((prev) => prev - 1);
         setIsLiked(false);
         updatePostLikeCache(postId, likes, false);

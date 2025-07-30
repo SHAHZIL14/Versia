@@ -146,7 +146,7 @@ class PostServices {
                 config.postMetaCollectionID,
                 postMetaId,
                 {
-                    likes: currentLikes + 1
+                    likes: currentLikes
                 }
             );
             return like;
@@ -178,7 +178,7 @@ class PostServices {
                 config.postMetaCollectionID,
                 postMetaId,
                 {
-                    likes: currentLikes - 1
+                    likes: currentLikes
                 }
             );
             return unlike;
