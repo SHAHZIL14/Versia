@@ -11,7 +11,7 @@ const Authentication = () => {
       <div
         className={`${
           authLoading ? "" : "hidden"
-        } fixed top-0 z-[1000] left-0 muted bg-[var(--brand-color)] w-screen h-screen object-cover flex justify-center items-center`}
+        } fixed top-0 z-[1000] left-0 muted bg-[var(--brand-color)] w-screen h-full object-cover flex justify-center items-center`}
       >
         <ThreeDot color="white" textColor="white" text={`Teleporting you into the app...`} />
       </div>

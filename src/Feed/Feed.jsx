@@ -1,27 +1,35 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Card from "../components/PostCard/Card";
 import { ID } from "appwrite";
 import "react-toastify/dist/ReactToastify.css";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import postServices from "../../services/Post";
 import userServices from "../../services/User";
 import { addBatch, addPostLikes } from "../../store/Post/PostSlice";
 import { useUser } from "../../context/userContext";
 import { ThreeDot } from "react-loading-indicators";
 
+
 const Feed = () => {
-  const userId = useSelector((state) => state.auth.userData.userId);
-  const storedPost = useSelector((state) => state.Post.data);
-  const storedPostLikes = useSelector((state) => state.Post.likesMap);
-  const isFetched = useSelector((state) => state.Post.isFetched);
-  const [loading, setLoading] = useState(!isFetched);
   const dispatch = useDispatch();
   const { setUserPosts } = useUser();
 
-  const fetchPosts = async (cursorDocumentID) => {
-    if (isFetched) return;
+  const userId = useSelector((state) => state.auth.userData.userId);
+  const storedPost = useSelector((state) => state.Post.data, shallowEqual);
+  const storedPostLikes = useSelector((state) => state.Post.likesMap, shallowEqual);
+  const isFetched = useSelector((state) => state.Post.isFetched);
 
-    const post = (await postServices.getPostBatch(cursorDocumentID)).documents;
+  const [loading, setLoading] = useState(!isFetched);
+
+  useEffect(() => {
+    if (!isFetched) {
+      fetchPosts();
+      fetchCurrentUserProfile();
+    }
+  }, [isFetched, userId]);
+
+  const fetchPosts = async () => {
+    const post = (await postServices.getPostBatch()).documents;
     const metaPost = await postServices.getMetaPostBatch(post);
 
     const POST = post.map((post) => {
@@ -31,22 +39,20 @@ const Feed = () => {
         metaData: meta || {},
       };
     });
+
     dispatch(addBatch(POST));
   };
 
   const getPostsLikes = async () => {
     const postIds = storedPost.map((post) => post?.data?.$id);
-    if (postIds.length === 0 || !userId) return;
+    if (!userId || postIds.length === 0) return;
 
-    const res = (await postServices.getPostLikesBatch(postIds, userId))
-      .documents;
-
+    const res = (await postServices.getPostLikesBatch(postIds, userId)).documents;
     const likesMap = {};
     res.forEach((element) => {
-      if (element?.postId) {
-        likesMap[element.postId] = true;
-      }
+      if (element?.postId) likesMap[element.postId] = true;
     });
+
     dispatch(addPostLikes(likesMap));
   };
 
@@ -56,51 +62,55 @@ const Feed = () => {
     if (userPosts) setUserPosts(userPosts);
   };
 
-  useEffect(() => {
-    if (isFetched) return;
-    fetchPosts();
-    fetchCurrentUserProfile();
-  }, [userId, isFetched]);
 
   useEffect(() => {
-    if (storedPost && storedPost.length > 0) {
+    if (storedPost?.length > 0) {
       getPostsLikes().then(() => setLoading(false));
     }
   }, [storedPost, userId]);
 
-  return loading ? (
-    <div className="w-screen h-screen flex justify-center items-center bg-[var(--brand-color)] fixed top-0 left-0">
-      <ThreeDot
-        color={["#cccccc", "#e6e6e6", "#ffffff", "#ffffff"]}
-        text="Getting latest for you."
-        textColor="white"
-      />
-    </div>
-  ) : (
+
+  const memoizedPosts = useMemo(() => {
+    return storedPost.map((post) => {
+      const mode = "general";
+      const data = {
+        authorId: post.data.authorId,
+        authorProfileURL: post.metaData.authorProfileURL,
+        authorName: post.metaData.authorName,
+        authorUserName: post.metaData.authorUserName,
+        imageURL: post.data.imageURL,
+        likes: post.metaData.likes,
+        comments: post.metaData.comments,
+        caption: post.data.caption,
+        postId: post.metaData.postId,
+        $id: post.metaData.$id,
+        isLiked: storedPostLikes[post.data.$id] === true,
+      };
+
+      return <Card data={data} mode={mode} key={post.data?.$id || ID.unique()} />;
+    });
+  }, [storedPost, storedPostLikes]);
+
+
+  if (loading) {
+    return (
+      <div className="fixed top-0 left-0 w-screen h-screen bg-[var(--brand-color)] flex justify-center items-center z-[1000]">
+        <ThreeDot
+          color={["#cccccc", "#e6e6e6", "#ffffff"]}
+          text="Getting latest for you."
+          textColor="white"
+        />
+      </div>
+    );
+  }
+
+ 
+  return (
     <div
       id="feed"
-      className="w-full lg:w-[40%] [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] 
-     max-h-fit overflow-scroll"
+      className="w-full lg:w-[40%] max-h-screen overflow-y-scroll scrollbar-hide"
     >
-      {storedPost.map((post) => {
-        const mode = "general";
-        const data = {
-          authorId: post.data.authorId,
-          authorProfileURL: post.metaData.authorProfileURL,
-          authorName: post.metaData.authorName,
-          authorUserName: post.metaData.authorUserName,
-          imageURL: post.data.imageURL,
-          likes: post.metaData.likes,
-          comments: post.metaData.comments,
-          caption: post.data.caption,
-          postId: post.metaData.postId,
-          $id: post.metaData.$id,
-          isLiked: storedPostLikes[post.data.$id] == true,
-        };
-        return (
-          <Card data={data} mode={mode} key={post.data?.$id || ID.unique()} />
-        );
-      })}
+      {memoizedPosts}
     </div>
   );
 };

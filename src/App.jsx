@@ -45,7 +45,7 @@ function App() {
     },
     {
       path: "/user/:userId/post/:postId",
-      element: <Card data={null} mode={"public"} />,
+      element: <Card data={null} mode={"specific"} />,
       loader: postInfoLoader,
     },
   ]);

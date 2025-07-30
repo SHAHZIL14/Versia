@@ -138,7 +138,7 @@ function Card({ data, mode }) {
       initial={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
       viewport={{ once: true }}
-      className=" w-full flex-col flex   h-fit text-xs md:text-sm lg:text-md   mx-auto overflow-hidden  border-blue-80 bg-white  py-0"
+      className={`${mode=='specific'?'min-h-screen':'h-fit'} w-full flex-col flex  text-xs md:text-sm lg:text-md   mx-auto overflow-hidden  border-blue-80 bg-white  py-0`}
     >
       <CardHeader
         authorId={postData.authorId}

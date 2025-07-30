@@ -7,7 +7,7 @@ const Home = () => {
   let [isModalOpen, setIsModalOpen] = useState(false);
   let [isOptionOpen, setIsOptionOpen] = useState(false);
   return (
-    <div id="home">
+    <div id="home" className="min-h-screen ">
       <Header
         options={{ isOptionOpen, setIsOptionOpen }}
         setIsModalOpen={setIsModalOpen}
