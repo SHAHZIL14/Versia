@@ -9,14 +9,16 @@ import { addBatch, addPostLikes } from "../../store/Post/PostSlice";
 import { useUser } from "../../context/userContext";
 import { ThreeDot } from "react-loading-indicators";
 
-
 const Feed = () => {
   const dispatch = useDispatch();
   const { setUserPosts } = useUser();
 
   const userId = useSelector((state) => state.auth.userData.userId);
   const storedPost = useSelector((state) => state.Post.data, shallowEqual);
-  const storedPostLikes = useSelector((state) => state.Post.likesMap, shallowEqual);
+  const storedPostLikes = useSelector(
+    (state) => state.Post.likesMap,
+    shallowEqual
+  );
   const isFetched = useSelector((state) => state.Post.isFetched);
 
   const [loading, setLoading] = useState(!isFetched);
@@ -47,7 +49,8 @@ const Feed = () => {
     const postIds = storedPost.map((post) => post?.data?.$id);
     if (!userId || postIds.length === 0) return;
 
-    const res = (await postServices.getPostLikesBatch(postIds, userId)).documents;
+    const res = (await postServices.getPostLikesBatch(postIds, userId))
+      .documents;
     const likesMap = {};
     res.forEach((element) => {
       if (element?.postId) likesMap[element.postId] = true;
@@ -62,13 +65,11 @@ const Feed = () => {
     if (userPosts) setUserPosts(userPosts);
   };
 
-
   useEffect(() => {
     if (storedPost?.length > 0) {
       getPostsLikes().then(() => setLoading(false));
     }
   }, [storedPost, userId]);
-
 
   const memoizedPosts = useMemo(() => {
     return storedPost.map((post) => {
@@ -87,24 +88,23 @@ const Feed = () => {
         isLiked: storedPostLikes[post.data.$id] === true,
       };
 
-      return <Card data={data} mode={mode} key={post.data?.$id || ID.unique()} />;
+      return (
+        <Card data={data} mode={mode} key={post.data?.$id || ID.unique()} />
+      );
     });
   }, [storedPost, storedPostLikes]);
 
-
   if (loading) {
     return (
-      <div className="fixed top-0 left-0 w-screen h-screen bg-[var(--brand-color)] flex justify-center items-center z-[1000]">
-        <ThreeDot
-          color={["#cccccc", "#e6e6e6", "#ffffff"]}
-          text="Getting latest for you."
-          textColor="white"
-        />
+      <div className="fixed top-0 left-0 w-screen h-screen bg-[var(--brand-color)] flex flex-col gap-3 justify-center items-center z-[1000]">
+        <ThreeDot color="white" textColor="white" />
+        <p className="font-bold text-xs md:text-md tracking-wider uppercase">
+        Getting latest for you
+      </p>
       </div>
     );
   }
 
- 
   return (
     <div
       id="feed"

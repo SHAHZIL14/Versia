@@ -126,11 +126,10 @@ function Card({ data, mode }) {
 
   return loading ? (
     <div className="w-screen h-screen flex justify-center items-center bg-[var(--brand-color)] fixed top-0 left-0">
-      <ThreeDot
-        color={["#cccccc", "#e6e6e6", "#ffffff", "#ffffff"]}
-        text="Recognizing you"
-        textColor="white"
-      />
+      <ThreeDot size="small" color="white" textColor="white" />
+      <p className="font-bold text-xs md:text-md tracking-wider uppercase">
+        recognizing you 
+      </p>
     </div>
   ) : (
     <motion.div
@@ -154,13 +153,13 @@ function Card({ data, mode }) {
           setShowDoubleTapHeart(true);
           setTimeout(() => setShowDoubleTapHeart(false), 800); // heart disappears
         }}
-        className={`${mode=='specific'?'max-h-[75vh]':'max-h-[500px]'} relative featuredImage cursor-pointer overflow-hidden flex justify-center items-center bg-contain bg-no-repeat bg-center lg:rounded h-fit lg:max-h-auto w-full`}
+        className={`${mode=='specific'?'max-h-[75vh]':'max-h-[500px] lg:max-h-[800px]'} relative featuredImage cursor-pointer overflow-hidden flex justify-center items-center bg-contain bg-no-repeat bg-center lg:rounded h-fit lg:max-h-auto w-full`}
       >
         {postData.imageURL && (
           <img
             loading="lazy-loading"
             src={postData.imageURL}
-            className="w-full max-h-[500px] object-cover object-top"
+            className="w-full max-h-[500px] lg:max-h-[800px] object-cover object-top"
             alt=""
           />
         )}

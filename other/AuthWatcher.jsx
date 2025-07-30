@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from "react-redux";
-import { useEffect,useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import authService from "../services/Auth";
 import { ThreeDot } from "react-loading-indicators";
@@ -14,10 +14,10 @@ const AuthWatcher = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  let [refreshKey,setRefreshKey] = useState(0);
-  const userId = useSelector((state)=>state.auth.userData.userId);
+  let [refreshKey, setRefreshKey] = useState(0);
+  const userId = useSelector((state) => state.auth.userData.userId);
   useEffect(() => {
-  if(userId) return ;
+    if (userId) return;
     authService
       .getUser()
       .then((user) => {
@@ -26,10 +26,10 @@ const AuthWatcher = () => {
             dispatch(
               logIn({
                 name: userDoc.name,
-                userName:userDoc.username,
+                userName: userDoc.username,
                 userId: user.$id,
                 profileSource: userDoc.profileSource,
-                userBio:userDoc.userBio
+                userBio: userDoc.userBio,
               })
             );
             if (location.pathname === "/auth") {
@@ -53,16 +53,17 @@ const AuthWatcher = () => {
 
   const loading = useSelector((state) => state.auth.loading);
   return loading ? (
-    <div className="w-screen h-screen flex justify-center items-center bg-[var(--brand-color)] fixed top-0 left-0">
-      <ThreeDot
-        color={["#cccccc", "#e6e6e6", "#ffffff", "#ffffff"]}
-        text="Recognizing you"
-        textColor="white"
-      />
+    <div className="w-screen h-screen gap-3 flex flex-col justify-center items-center bg-[var(--brand-color)] fixed top-0 left-0">
+      <ThreeDot size="small" color="white" textColor="white" />
+      <p className="font-bold text-xs md:text-md tracking-wider uppercase">
+        recognizing you 
+      </p>
     </div>
   ) : null;
 };
 
 export default AuthWatcher;
 
-export const runAuthWatcher =()=>{setRefreshKey((prev)=>prev+1)};
+export const runAuthWatcher = () => {
+  setRefreshKey((prev) => prev + 1);
+};

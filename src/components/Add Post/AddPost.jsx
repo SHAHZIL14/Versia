@@ -29,73 +29,69 @@ const AddPost = () => {
     (state) => state.auth.userData.profileSource
   );
 
-const handleMedia = async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
+  const handleMedia = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-  setIsMediaLoading(true);
+    setIsMediaLoading(true);
 
-  const fileExt = file.name.split(".").pop().toLowerCase();
+    const fileExt = file.name.split(".").pop().toLowerCase();
 
-  try {
-    let finalBlob;
+    try {
+      let finalBlob;
 
-    if (fileExt === "heic") {
-      console.log("HEIC entered");
-      finalBlob = await heic2any({
-        blob: file,
-        toType: "image/jpeg",
-        quality: 0.7,
+      if (fileExt === "heic") {
+        console.log("HEIC entered");
+        finalBlob = await heic2any({
+          blob: file,
+          toType: "image/jpeg",
+          quality: 0.7,
+        });
+      } else if (fileExt === "jpeg" || fileExt === "jpg") {
+        console.log("JPEG/JPG entered");
+        finalBlob = file; // Already valid
+      } else {
+        console.log("OTHER image entered");
+        const options = {
+          maxSizeMB: 1,
+          maxWidthOrHeight: 1920,
+          useWebWorker: true,
+          fileType: "image/jpeg",
+          initialQuality: 0.7,
+        };
+        finalBlob = await imageCompression(file, options);
+      }
+
+      const appwriteFile = new File([finalBlob], `media-${Date.now()}.jpg`, {
+        type: "image/jpeg",
       });
-    } else if (fileExt === "jpeg" || fileExt === "jpg") {
-      console.log("JPEG/JPG entered");
-      finalBlob = file; // Already valid
-    } else {
-      console.log("OTHER image entered");
-      const options = {
-        maxSizeMB: 1,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-        fileType: "image/jpeg",
-        initialQuality: 0.7,
+
+      const previewURL = URL.createObjectURL(appwriteFile);
+      const imgCheck = new Image();
+
+      imgCheck.onload = () => {
+        setInputMedia(appwriteFile);
+        setMediaURL(previewURL);
+        setIsMediaLoading(false);
       };
-      finalBlob = await imageCompression(file, options);
-    }
 
-    
-    const appwriteFile = new File(
-      [finalBlob],
-      `media-${Date.now()}.jpg`, 
-      { type: "image/jpeg" }
-    );
+      imgCheck.onerror = () => {
+        URL.revokeObjectURL(previewURL);
+        toast.error("Invalid image file, please upload another one.");
+        setInputMedia("");
+        setMediaURL("");
+        setIsMediaLoading(false);
+      };
 
-    const previewURL = URL.createObjectURL(appwriteFile);
-    const imgCheck = new Image();
-
-    imgCheck.onload = () => {
-      setInputMedia(appwriteFile); 
-      setMediaURL(previewURL);
-      setIsMediaLoading(false);
-    };
-
-    imgCheck.onerror = () => {
-      URL.revokeObjectURL(previewURL);
-      toast.error("Invalid image file, please upload another one.");
+      imgCheck.src = previewURL;
+    } catch (error) {
+      console.error("Image upload error:", error);
+      toast.error("Error uploading photo!");
       setInputMedia("");
       setMediaURL("");
       setIsMediaLoading(false);
-    };
-
-    imgCheck.src = previewURL;
-  } catch (error) {
-    console.error("Image upload error:", error);
-    toast.error("Error uploading photo!");
-    setInputMedia("");
-    setMediaURL("");
-    setIsMediaLoading(false);
-  }
-};
-
+    }
+  };
 
   const addPost = () => {
     if (!status || !userId) {
@@ -154,13 +150,13 @@ const handleMedia = async (e) => {
         id="addPostLoading"
         className={`${
           isLoading ? "" : "hidden"
-        } absolute top-0 left-0 h-full w-full z-10 bg-black/30 backdrop-blur-sm flex justify-center items-center`}
+        } absolute top-0 left-0 h-full w-full z-10 bg-black/30 backdrop-blur-sm flex flex-col gap-5 justify-center items-center`}
       >
         <BlinkBlur
-          color={["#000000", "#082828", "#115252", "#1a7c7c"]}
-          text="Showcasing your picture to the world"
+          color="var(--brand-color)"
           textColor="white"
         />
+        <p className="font-bold ">Don't move away , stay here. </p>
       </div>
       <button
         onClick={(e) => {
