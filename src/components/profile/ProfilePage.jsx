@@ -10,7 +10,7 @@ import { useUser } from "../../../context/userContext";
 import { useState, useEffect, use } from "react";
 import { ThreeDot, FourSquare } from "react-loading-indicators";
 import { motion } from "motion/react";
-import { Cross, Edit, Save, X } from "lucide-react";
+import { Camera, Cross, Edit, Save, X } from "lucide-react";
 import { updateBio } from "../../../store/authentication/authenticationSlice";
 import Toastify from "toastify-js";
 import "toastify-js/src/toastify.css";
@@ -81,7 +81,7 @@ function ProfilePage({ mode }) {
       />
     </div>
   ) : (
-    <div id="profile" className="min-h-screen w-screen bg-white">
+    <div id="profile" className="min-h-screen w-screen flex flex-col gap-y-5 bg-white">
       <div className="flex flex-col text-[var(--brand-color)] py-3 px-2">
         <div className="flex gap-0">
           <div className="w-[50%] py-5 flex flex-col gap-5 justify-center items-start">
@@ -195,27 +195,34 @@ function ProfilePage({ mode }) {
         )}
       </div>
 
-      <div className="grid grid-cols-3 text-black gap-0 w-full">
-        {userData.userPosts?.map((eachPost) => (
-          <motion.div
-            key={eachPost.$id}
-            className="hover:brightness-75 cursor-pointer post overflow-hidden h-60 lg:h-96 lg:w-full"
-          >
-            <img
-              onClick={() => {
-                setLoading(true);
-                navigate(
-                  `/user/${currentUserData.userId}/post/${eachPost.$id}`
-                );
-                if (location.pathname.includes("post/")) setLoading(false);
-              }}
-              className="object-center object-cover h-full w-full"
-              src={eachPost.imageURL}
-              alt="unable to fetch"
-            />
-          </motion.div>
-        ))}
-      </div>
+      {userData.userPosts.length == 0 ? (
+        <motion.div className="w-full text-[var(--brand-color)] flex flex-col items-center justify-center lg:text-lg text-xs gap-3  text-center">
+          <p>No post uploaded yet</p>
+          <Camera color="var(--brand-color)"/>
+        </motion.div>
+      ) : (
+        <div className="grid grid-cols-3 text-black gap-0 w-full">
+          {userData.userPosts?.map((eachPost) => (
+            <motion.div
+              key={eachPost.$id}
+              className="hover:brightness-75 active:brightness-75 cursor-pointer post overflow-hidden h-60 lg:h-96 lg:w-full"
+            >
+              <img
+                onClick={() => {
+                  setLoading(true);
+                  navigate(
+                    `/user/${currentUserData.userId}/post/${eachPost.$id}`
+                  );
+                  if (location.pathname.includes("post/")) setLoading(false);
+                }}
+                className="object-center object-cover h-full w-full"
+                src={eachPost.imageURL}
+                alt="unable to fetch"
+              />
+            </motion.div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
