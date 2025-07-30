@@ -210,11 +210,11 @@ function ProfilePage({ mode }) {
           </motion.button>
         </motion.div>
       ) : (
-        <div className="grid grid-cols-3 text-black gap-0 w-full">
+        <div className="grid grid-cols-2 text-black gap-1 w-full   min-h-auto">
           {userData.userPosts?.map((eachPost) => (
             <motion.div
               key={eachPost.$id}
-              className="hover:brightness-75 active:brightness-75 cursor-pointer post overflow-hidden h-60 lg:h-96 lg:w-full"
+              className="hover:brightness-75 active:brightness-75 cursor-pointer rounded  overflow-hidden h-60 lg:h-96 lg:w-full"
             >
               <img
                 onClick={() => {
