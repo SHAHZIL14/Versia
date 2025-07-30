@@ -6,48 +6,57 @@ import { useNavigate } from "react-router-dom";
 import { Check } from "lucide-react";
 const Verification = () => {
   const navigate = useNavigate();
-  const [verified, setVerified] = useState(null);
+  const [verified, setVerified] = useState(null); 
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const userId = params.get("userId");
     const secret = params.get("secret");
 
     if (!userId || !secret) {
-      return toast.error("Invalid Link");
+      toast.error("Invalid Link");
+      setVerified(false); 
+      setTimeout(() => navigate("/auth"), 2000);
+      return;
     }
+
     authService
       .verifyEmailAddress(userId, secret)
-      .then(function (response) {
-        toast.success("Verified!, you can login now.");
+      .then(() => {
+        toast.success("Verified! You can login now.");
         setVerified(true);
-        navigate("/auth");
       })
-      .catch(function (error) {
-        toast.error("Not verified!");
+      .catch(() => {
+        toast.error("Verification failed.");
         setVerified(false);
-        navigate("/auth");
       })
       .finally(() => {
         authService.logout();
-        navigate("/auth");
+        setTimeout(() => navigate("/auth"), 2000);
       });
-  }, [verified]);
+  }, []);
+
   return (
     <div className="w-screen h-screen flex justify-center items-center bg-[var(--brand-color)] fixed top-0 left-0">
-      {verified ? (
-        <div >
-          <p>Verified</p>
+      {verified === true ? (
+        <div className="flex flex-col items-center gap-2 text-white">
+          <p>✅ Verified</p>
           <Check color="white" />
+        </div>
+      ) : verified === false ? (
+        <div className="flex flex-col items-center gap-2 text-white">
+          <p>❌ Verification Failed</p>
         </div>
       ) : (
         <ThreeDot
           color={["#cccccc", "#e6e6e6", "#ffffff", "#ffffff"]}
-          text="please wait ,verifying you..."
+          text="Please wait, verifying you..."
           textColor="white"
         />
       )}
     </div>
   );
 };
+
 
 export default Verification;
