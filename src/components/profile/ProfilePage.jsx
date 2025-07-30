@@ -81,7 +81,10 @@ function ProfilePage({ mode }) {
       />
     </div>
   ) : (
-    <div id="profile" className="min-h-screen w-screen flex flex-col gap-y-5 bg-white">
+    <div
+      id="profile"
+      className="min-h-screen w-screen flex flex-col gap-y-5 bg-white"
+    >
       <div className="flex flex-col text-[var(--brand-color)] py-3 px-2">
         <div className="flex gap-0">
           <div className="w-[50%] py-5 flex flex-col gap-5 justify-center items-start">
@@ -198,7 +201,13 @@ function ProfilePage({ mode }) {
       {userData.userPosts.length == 0 ? (
         <motion.div className="w-full text-[var(--brand-color)] flex flex-col items-center justify-center lg:text-lg text-xs gap-3  text-center">
           <p>No post uploaded yet</p>
-          <Camera color="var(--brand-color)"/>
+          <motion.button
+            onClick={() => {
+              navigate("/add-post");
+            }}
+          >
+            <Camera color="var(--brand-color)" />
+          </motion.button>
         </motion.div>
       ) : (
         <div className="grid grid-cols-3 text-black gap-0 w-full">
