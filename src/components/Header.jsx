@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { Plus, Menu, LogOut } from "lucide-react";
+import { Plus, Menu, LogOut, CircleUser } from "lucide-react";
 import "../index.css";
 import { Tooltip, Button } from "@material-tailwind/react";
 import useClickOutside from "../../Hooks/useClickOutside";
@@ -9,13 +9,12 @@ import authService from "../../services/Auth";
 import { logOut } from "../../store/authentication/authenticationSlice";
 import { toast } from "react-toastify";
 
-
 const Header = ({ options }) => {
   const username = useSelector((state) => state.auth.userData.name);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const profileSrc =
-    null || useSelector((state) => state.auth.userData.profileSource);
+  false || useSelector((state) => state.auth.userData.profileSource);
   let [isNavHidden, setIsNavHidden] = useState(true);
   const optionRef = useRef();
   const navRef = useRef();
@@ -32,7 +31,7 @@ const Header = ({ options }) => {
             alt=""
           />
         </div>
-        
+
         <div
           ref={navRef}
           className="h-8 w-8 absolute right-15 lg:hidden"
@@ -113,14 +112,14 @@ const Header = ({ options }) => {
               id="profile"
               className="h-9 w-9 lg:h-12 lg:w-12 flex justify-center items-center  rounded-[50%] overflow-hidden"
             >
-              {profileSrc != null ? (
+              {profileSrc? (
                 <img
                   loading="lazy-loading"
                   className="h-full w-full lg:h-12 lg:w-12 object-center object-cover"
                   src={profileSrc}
                 />
               ) : (
-                <p>{username?.charAt(0)}</p>
+                <CircleUser color="white" size={30} />
               )}
             </div>
           </div>

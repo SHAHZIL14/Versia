@@ -72,6 +72,23 @@ class UserSevices {
         }
     }
 
+    async updateUserProfilePic(file, userId) {
+        try {
+            const newProfileSource = storageServices.getFileView((await storageServices.uploadFile(file)).$id);
+            const updateProfileSource = await this.database.updateDocument(
+                config.databaseID,
+                config.userCollectionID,
+                userId,
+                {
+                    profileSource: newProfileSource
+                }
+            )
+            return updateProfileSource;
+        } catch (error) {
+            throw error;
+        }
+    }
+
 }
 
 const userServices = new UserSevices();

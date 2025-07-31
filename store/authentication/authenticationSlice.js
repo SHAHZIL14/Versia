@@ -23,10 +23,13 @@ const authenticationSlice = createSlice({
         },
         updateBio: function (state, action) {
             state.userData.userBio = action.payload;
+        },
+        updateProfile: function (state, action) {
+            state.userData.profileSource = action.payload;
         }
     }
 });
 
-export const { logIn, logOut, setLoading,updateBio } = authenticationSlice.actions;
+export const { logIn, logOut, setLoading, updateBio,updateProfile } = authenticationSlice.actions;
 
 export default authenticationSlice.reducer;

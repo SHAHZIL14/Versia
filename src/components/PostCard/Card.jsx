@@ -14,6 +14,7 @@ import {
   getPostLikeCache,
   updatePostLikeCache,
 } from "../../utilities/postCache";
+import userServices from "../../../services/User";
 
 function Card({ data, mode }) {
   const [loading, setLoading] = useState(true);
@@ -39,36 +40,49 @@ function Card({ data, mode }) {
   const [showDoubleTapHeart, setShowDoubleTapHeart] = useState(false);
 
   useEffect(() => {
-    if (mode === "general" && data) {
-      setPostData({
-        authorId: data.authorId,
-        authorProfile: data.authorProfileURL,
-        name: data.authorName,
-        username: data.authorUserName,
-        imageURL: data.imageURL,
-        likes: data.likes,
-        comments: data.comments,
-        caption: data.caption,
-        postId: data.postId,
-        postMetaId: data.$id,
-        isLiked: data.isLiked,
-      });
-    } else if (loaderData) {
-      setPostData({
-        authorId: loaderData.authorId,
-        authorProfile: loaderData.authorProfileURL,
-        name: loaderData.authorName,
-        username: loaderData.authorUserName,
-        imageURL: loaderData.imageURL,
-        likes: loaderData.likes,
-        comments: loaderData.comments,
-        caption: loaderData.caption,
-        postId: loaderData.postId,
-        postMetaId: loaderData.$id,
-        isLiked: loaderData.isLiked,
-      });
-    }
+    const fetchAuthorProfile = async () => {
+      if (mode === "general" && data) {
+        const fetchedAuthorProfile = (
+          await userServices.getUserInfo(data.authorId)
+        ).profileSource;
+  
+        setPostData({
+          authorId: data.authorId,
+          authorProfile: fetchedAuthorProfile,
+          name: data.authorName,
+          username: data.authorUserName,
+          imageURL: data.imageURL,
+          likes: data.likes,
+          comments: data.comments,
+          caption: data.caption,
+          postId: data.postId,
+          postMetaId: data.$id,
+          isLiked: data.isLiked,
+        });
+      } else if (loaderData) {
+        const fetchedAuthorProfile = (
+          await userServices.getUserInfo(loaderData.authorId)
+        ).profileSource;
+  
+        setPostData({
+          authorId: loaderData.authorId,
+          authorProfile: fetchedAuthorProfile,
+          name: loaderData.authorName,
+          username: loaderData.authorUserName,
+          imageURL: loaderData.imageURL,
+          likes: loaderData.likes,
+          comments: loaderData.comments,
+          caption: loaderData.caption,
+          postId: loaderData.postId,
+          postMetaId: loaderData.$id,
+          isLiked: loaderData.isLiked,
+        });
+      }
+    };
+  
+    fetchAuthorProfile(); // call the async function
   }, [mode, data, loaderData]);
+  
 
   useEffect(() => {
     if (postData && postData.postId) {
@@ -87,16 +101,20 @@ function Card({ data, mode }) {
   const handleHeartClick = async (postId) => {
     if (isProcessing) return;
     setIsProcessing(true);
-  
-    if (isLiked) {
 
+    if (isLiked) {
       const updatedLikes = likes - 1;
       setLikes(updatedLikes);
       setIsLiked(false);
       updatePostLikeCache(postId, updatedLikes, false);
-  
+
       try {
-        const result = await postServices.unlikePost(postId, postData.postMetaId, userId, updatedLikes);
+        const result = await postServices.unlikePost(
+          postId,
+          postData.postMetaId,
+          userId,
+          updatedLikes
+        );
       } catch (error) {
         setLikes((prev) => prev + 1);
         setIsLiked(true);
@@ -104,16 +122,19 @@ function Card({ data, mode }) {
       } finally {
         setIsProcessing(false);
       }
-  
     } else {
-
       const updatedLikes = likes + 1;
       setLikes(updatedLikes);
       setIsLiked(true);
       updatePostLikeCache(postId, updatedLikes, true);
-  
+
       try {
-        const result = await postServices.likePost(postId, postData.postMetaId, userId, updatedLikes);
+        const result = await postServices.likePost(
+          postId,
+          postData.postMetaId,
+          userId,
+          updatedLikes
+        );
       } catch (error) {
         console.error("Like failed:", error);
         setLikes((prev) => prev - 1);
@@ -148,7 +169,7 @@ function Card({ data, mode }) {
     <div className="w-screen h-screen flex flex-col gap-3 justify-center items-center bg-[var(--brand-color)] fixed top-0 left-0">
       <ThreeDot size="small" color="white" textColor="white" />
       <p className="font-bold text-xs md:text-md tracking-wider uppercase">
-        recognizing you
+        Almost there
       </p>
     </div>
   ) : (
@@ -185,7 +206,7 @@ function Card({ data, mode }) {
           <img
             loading="lazy"
             src={postData.imageURL}
-            className="w-full max-h-[500px] lg:max-h-[800px] object-cover object-top"
+            className="w-full max-h-[500px] lg:max-h-[800px] object-cover object-center"
             alt=""
           />
         )}

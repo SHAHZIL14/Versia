@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check } from "lucide-react";
+import { Check, CircleUser } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Toastify from "toastify-js";
 import "toastify-js/src/toastify.css";
@@ -43,8 +43,11 @@ function CardHeader({
             }}
             className="flex gap-2 items-center cursor-pointer"
           >
-            <div className="cursor-pointer profile h-10 w-10 rounded-[50%] overflow-hidden border border-black">
-              {authorProfileURL && (
+            <div className="cursor-pointer profile h-10 w-10 rounded-[50%] overflow-hidden ">
+              {authorProfileURL==''?
+              <CircleUser className="h-full w-full" color='var(--brand-color) ' />
+              :
+              (
                 <img
                   loading="lazy-loading"
                   src={authorProfileURL}

@@ -10,10 +10,25 @@ import { useUser } from "../../../context/userContext";
 import { useState, useEffect, use } from "react";
 import { ThreeDot, FourSquare } from "react-loading-indicators";
 import { motion } from "motion/react";
-import { Camera, Cross, Edit, Save, X } from "lucide-react";
-import { updateBio } from "../../../store/authentication/authenticationSlice";
+import {
+  Camera,
+  CircleUser,
+  Cross,
+  Edit,
+  Edit2Icon,
+  ImagePlusIcon,
+  Save,
+  X,
+} from "lucide-react";
+import {
+  updateBio,
+  updateProfile,
+} from "../../../store/authentication/authenticationSlice";
 import Toastify from "toastify-js";
 import "toastify-js/src/toastify.css";
+import imageCompression from "browser-image-compression";
+import heic2any from "heic2any";
+import { toast } from "react-toastify";
 
 function ProfilePage({ mode }) {
   const navigate = useNavigate();
@@ -23,7 +38,14 @@ function ProfilePage({ mode }) {
   const [loading, setLoading] = useState(true);
   const [bioLoading, setBioLoading] = useState(false);
   const [bio, setBio] = useState("");
+  const [userCurrentProfile, setUserCurrentProfile] = useState("");
   const [editable, setEditable] = useState(false);
+  const [profileInput, setProfileInput] = useState(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [updateLoading, setUpdateLoading] = useState(false);
+  const [profilePreview, setProfilePreview] = useState("");
+  const [isProfileEditable, setIsProfileEditable] = useState(false);
+
   const { userPosts: currentUserPosts } = useUser();
   const currentUserData = useSelector((state) => state.auth.userData);
   const loaderData = useLoaderData();
@@ -40,7 +62,7 @@ function ProfilePage({ mode }) {
       setUserData({
         name: currentUserData.name,
         username: currentUserData.userName,
-        profileURL: currentUserData.profileSource,
+        profileURL: false || currentUserData.profileSource,
         userPosts: currentUserPosts || [],
         userBio: currentUserData.userBio,
       });
@@ -48,7 +70,7 @@ function ProfilePage({ mode }) {
       setUserData({
         name: loaderData.name,
         username: loaderData.username,
-        profileURL: loaderData.profileURL,
+        profileURL: false || loaderData.profileURL,
         userPosts: loaderData.userPosts || [],
         userBio: loaderData.userBio,
       });
@@ -56,7 +78,10 @@ function ProfilePage({ mode }) {
     setTimeout(() => setLoading(false), 200);
   }, [mode, currentUserData, currentUserPosts, loaderData]);
 
-  useEffect(() => setBio(userData.userBio), [userData]);
+  useEffect(() => {
+    setBio(userData.userBio);
+    setUserCurrentProfile(userData.profileURL);
+  }, [userData]);
 
   const handleBioSave = async () => {
     setEditable((prev) => !prev);
@@ -73,6 +98,90 @@ function ProfilePage({ mode }) {
         setBioLoading(false);
       });
   };
+
+  const handleProfile = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const fileExt = file.name.split(".").pop().toLowerCase();
+    setPreviewLoading(true);
+
+    try {
+      let finalBlob;
+
+      if (fileExt === "heic") {
+        console.log("HEIC entered");
+        finalBlob = await heic2any({
+          blob: file,
+          toType: "image/jpeg",
+          quality: 0.7,
+        });
+      } else if (fileExt === "jpeg" || fileExt === "jpg") {
+        console.log("JPEG/JPG entered");
+        finalBlob = file;
+      } else {
+        console.log("OTHER image entered");
+        const options = {
+          maxSizeMB: 1,
+          maxWidthOrHeight: 1920,
+          useWebWorker: true,
+          fileType: "image/jpeg",
+          initialQuality: 0.7,
+        };
+        finalBlob = await imageCompression(file, options);
+      }
+
+      const appwriteCompatibleFile = new File([finalBlob], "profile.jpg", {
+        type: "image/jpeg",
+      });
+
+      const previewURL = URL.createObjectURL(appwriteCompatibleFile);
+      const imgCheck = new Image();
+
+      imgCheck.onload = () => {
+        setProfileInput(appwriteCompatibleFile);
+        setProfilePreview(previewURL);
+        setPreviewLoading(false);
+      };
+
+      imgCheck.onerror = () => {
+        URL.revokeObjectURL(previewURL);
+        toast.error("Invalid file, please upload a different one.");
+        setProfilePreview("");
+        setProfileInput("");
+        setPreviewLoading(false);
+      };
+
+      imgCheck.src = previewURL;
+    } catch (error) {
+      console.error("File handling error:", error);
+      toast.error("Error occurred. Please upload your profile again.");
+      setProfilePreview("");
+      setProfileInput("");
+      setPreviewLoading(false);
+    }
+  };
+
+  const updateProfilePic = async () => {
+    setUpdateLoading(true);
+    userServices
+      .updateUserProfilePic(profileInput, currentUserData.userId)
+      .then(() => {
+        toast.success("Profile Updated.");
+        dispatch(updateProfile(profilePreview));
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Failed to update!");
+        setProfilePreview(userData.profileURL);
+      })
+      .finally(() => {
+        setUpdateLoading(false);
+        setIsProfileEditable(false);
+        setProfileInput("");
+      });
+  };
+
   return loading ? (
     <div className="w-screen h-screen z-50 flex justify-center items-center bg-[var(--brand-color)] fixed top-0 left-0">
       <ThreeDot
@@ -87,12 +196,88 @@ function ProfilePage({ mode }) {
     >
       <div className="flex flex-col text-[var(--brand-color)] py-3 px-2">
         <div className="flex gap-0">
-          <div className="w-[50%] py-5 flex flex-col gap-5 justify-center items-start">
-            <img
-              className="object-cover object-center h-24 w-24 lg:w-38 lg:h-38 rounded-full"
-              src={userData.profileURL ? userData.profileURL : "a"}
-              alt="profile"
-            />
+          <div className="w-[50%] py-5 flex flex-col gap-5 justify-center items-start relative">
+            <div className="flex items-center gap-3 flex-row-reverse">
+              {mode == "current" && (
+                <div
+                  className={`${
+                    updateLoading ? "hidden" : ""
+                  }  top-0  right-[20%] flex flex-col  gap-5 h-fit w-fit`}
+                >
+                  {isProfileEditable ? (
+                    <>
+                      <button onClick={() => setIsProfileEditable(false)}>
+                        <X />
+                      </button>
+                      <button onClick={updateProfilePic}>
+                        <Save />
+                      </button>
+                    </>
+                  ) : (
+                    <button onClick={() => setIsProfileEditable(true)}>
+                      <Edit2Icon className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+              )}
+
+              <div className={`${updateLoading ? "hidden" : ""}`}>
+                {isProfileEditable ? (
+                  <div
+                    onClick={() =>
+                      document.getElementById("profileChange").click()
+                    }
+                    className={`h-24 w-24 lg:w-38 lg:h-38 rounded-full ${
+                      profilePreview ? "" : "border border-[var(--brand-color)]"
+                    } flex justify-center items-center overflow-hidden relative `}
+                  >
+                    {profilePreview ? (
+                      <img
+                        className="object-cover object-center h-24 w-24 lg:w-38 lg:h-38 rounded-full"
+                        src={profilePreview}
+                        alt="profile"
+                      />
+                    ) : (
+                      <ImagePlusIcon
+                        className={`${previewLoading ? "hidden" : ""} w-[50%]`}
+                      />
+                    )}
+                    <input
+                      id="profileChange"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleProfile}
+                    />
+                    <div
+                      className={`${
+                        previewLoading ? "" : "hidden"
+                      } absolute h-full w-full bg-white flex justify-center items-center z-10 `}
+                    >
+                      <FourSquare size="small" color={"var(--brand-color)"} />
+                    </div>
+                  </div>
+                ) : userCurrentProfile ? (
+                  <img
+                    className="object-cover object-center h-24 w-24 lg:w-38 lg:h-38 rounded-full"
+                    src={userCurrentProfile}
+                    alt="profile"
+                  />
+                ) : (
+                  <CircleUser color="var(--brand-color)" size={100} />
+                )}
+              </div>
+
+              <div
+                className={`${
+                  updateLoading ? "" : "hidden"
+                }  h-24 w-24 flex flex-col justify-center items-center rounded-full `}
+              >
+                <FourSquare size="small" color="var(--brand-color)" />
+                <p className="text-xs md:text-md">updating...</p>
+              </div>
+            </div>
+
             <div>
               <p className="text-xs lg:text-lg font-semibold">
                 {userData.name}
@@ -100,6 +285,7 @@ function ProfilePage({ mode }) {
               <p className="text-xs lg:text-lg ">@{userData.username}</p>
             </div>
           </div>
+
           <div className="w-[50%] py-7 flex flex-col gap-5 items-center justify-start">
             <div className="flex gap-x-5">
               <div className="flex flex-col text-xs lg:text-lg  items-center p-1">
@@ -146,8 +332,10 @@ function ProfilePage({ mode }) {
             color={["#000000", "#082828", "#115252", "#1a7c7c"]}
           />
         ) : (
-          <div>
-            <span className="font-semibold text-xs lg:text-lg justify-start items-center gap-x-5 flex ">
+          <div className={`${userData.userBio ? "" : "hidden"} `}>
+            <span
+              className={`font-semibold text-xs lg:text-lg justify-start items-center gap-x-5 flex `}
+            >
               <span>BIO</span>
               <span className="flex gap-x-5">
                 {editable ? (
@@ -164,8 +352,8 @@ function ProfilePage({ mode }) {
                 ) : (
                   <>
                     {mode == "current" ? (
-                      <Edit
-                        className="h-4 w-4 lg:h-5 cursor-pointer lg:w-5"
+                      <Edit2Icon
+                        className="h-3 w-3 lg:h-5 cursor-pointer lg:w-5"
                         onClick={() => setEditable((prev) => !prev)}
                       />
                     ) : (

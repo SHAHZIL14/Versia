@@ -10,9 +10,9 @@ import heic2any from "heic2any";
 import imageCompression from "browser-image-compression";
 import { Commet, ThreeDot } from "react-loading-indicators";
 const SignUp = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
-  let [profileInput, setProfileInput] = useState(null);
-  let [profile, setProfile] = useState("Add Profile");
-  let [profilePreview, setProfilePreview] = useState("");
+  const [profileInput, setProfileInput] = useState(null);
+  const [profile, setProfile] = useState("Add Profile");
+  const [profilePreview, setProfilePreview] = useState("");
   let [hasWarned, setHasWarned] = useState(false);
   let [previewLoading, setPreviewLoading] = useState(false);
   const dispatch = useDispatch();
