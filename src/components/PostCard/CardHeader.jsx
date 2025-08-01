@@ -1,38 +1,79 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Check, CircleUser } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Toastify from "toastify-js";
 import "toastify-js/src/toastify.css";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { ThreeDot } from "react-loading-indicators";
+import userServices from "../../../services/User";
+import { updateFollowees } from "../../../store/authentication/authenticationSlice";
 
-function CardHeader({
-  authorId,
-  authorName = "guest",
-  authorUserName = "guest",
-  authorProfileURL,
-}) {
-  let [isFollowing, setIsFollowing] = useState(false);
+function CardHeader({ postData }) {
+  const [localFollow, setLocalFollow] = useState(
+    useSelector((state) =>
+      state.auth.userData.followees.includes(postData.authorId)
+    )
+  );
+
+  const globalFollow = useSelector((state) =>
+    state.auth.userData.followees.includes(postData.authorId)
+  );
+
+  const [isProcessing, setIsProcessing] = useState(false);
   const [loading, setLoading] = useState(false);
   const userId = useSelector((state) => state.auth.userData.userId);
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const handleFollowClick = async () => {
+    if (isProcessing) return;
+    setIsProcessing(true);
+
+    if (localFollow) {
+      setLocalFollow(false);
+      try {
+        await userServices.unfollow(postData.authorId, userId);
+        dispatch(
+          updateFollowees({
+            type: "remove",
+            authorId: postData.authorId,
+          })
+        );
+      } catch (error) {
+        setLocalFollow(true);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else {
+      setLocalFollow(true);
+      try {
+        await userServices.follow(postData.authorId, userId);
+        dispatch(updateFollowees({ type: "add", authorId: postData.authorId }));
+      } catch (error) {
+        setLocalFollow(false);
+      } finally {
+        setIsProcessing(false);
+      }
+    }
+  };
+
+  useEffect(() => {
+    setLocalFollow(globalFollow);
+  }, [globalFollow]);
   return (
     <>
       <div className="w-full  rounded-t-2xl flex gap-3 items-center justify-between bg-gray-40 px-2 py-2 ">
         {loading ? (
-          <ThreeDot
-            color={['var(--brand-color)']}
-            size="small"
-          />
+          <ThreeDot color={["var(--brand-color)"]} size="small" />
         ) : (
           <div
             onClick={() => {
               setLoading(true);
-              if (userId == authorId) {
+              if (userId == postData.authorId) {
                 navigate("/profile");
               } else {
-                navigate(`/user/${authorId}`);
+                navigate(`/user/${postData.authorId}`);
               }
               if (
                 location.pathname.includes("/profile") ||
@@ -44,57 +85,44 @@ function CardHeader({
             className="flex gap-2 items-center cursor-pointer"
           >
             <div className="cursor-pointer profile h-10 w-10 rounded-[50%] overflow-hidden ">
-              {authorProfileURL==''?
-              <CircleUser className="h-full w-full" color='var(--brand-color) ' />
-              :
-              (
+              {postData.authorProfile == "" ? (
+                <CircleUser
+                  className="h-full w-full"
+                  color="var(--brand-color) "
+                />
+              ) : (
                 <img
                   loading="lazy-loading"
-                  src={authorProfileURL}
+                  src={postData.authorProfile}
                   alt="Profile"
                   className="rounded-lg w-full h-full object-cover object-center"
                 />
               )}
             </div>
             <div className="about-author flex flex-col  justify-center text-black">
-              <span className="text-sm/tight font-medium">{authorName}</span>
-              <span className="text-xs">{`@${authorUserName}`}</span>
+              <span className="text-sm/tight font-medium">{postData.name}</span>
+              <span className="text-xs">{`@${postData.username}`}</span>
             </div>
           </div>
         )}
 
         <div
-          className={`following-button ${authorId == userId ? "hidden" : ""}  ${
-            isFollowing
+          className={`following-button ${
+            postData.authorId == userId ? "hidden" : ""
+          }  ${
+            localFollow
               ? "bg-white  text-[var(--brand-color)] font-medium"
               : "bg-[var(--brand-color)]"
           }  py-1 px-2 text-sm rounded-lg cursor-pointer `}
         >
           <button
             className={`cursor-pointer transition-all ease-in-out duration-100 flex items-center gap-px`}
-            onClick={() => {
-              setIsFollowing((prev) => !prev);
-              Toastify({
-                text: "Follow feature will be available soon",
-                duration: 3000,
-                gravity: "top",
-                position: "right",
-                style: {
-                  background: "var(--brand-color)",
-                  color: "#fff",
-                  borderRadius: "10px",
-                  boxShadow: "0 0 12px rgba(255,255,255,0.8)",
-                  fontWeight: "300",
-                  border: "1px solid var(--brand-color)",
-                  fontSize: "12px",
-                },
-              }).showToast();
-            }}
+            onClick={handleFollowClick}
           >
             <span className="inline-block transition-transform duration-200 scale-100">
-              {isFollowing ? `Following` : "Follow"}
+              {localFollow ? `Following` : "Follow"}
             </span>
-            <Check className={`${isFollowing ? "" : "hidden"} h-4 `} />
+            <Check className={`${localFollow ? "" : "hidden"} h-4 `} />
           </button>
         </div>
       </div>

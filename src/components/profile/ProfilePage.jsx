@@ -29,6 +29,7 @@ import "toastify-js/src/toastify.css";
 import imageCompression from "browser-image-compression";
 import heic2any from "heic2any";
 import { toast } from "react-toastify";
+import { updateFollowees } from "../../../store/authentication/authenticationSlice";
 
 function ProfilePage({ mode }) {
   const navigate = useNavigate();
@@ -45,10 +46,20 @@ function ProfilePage({ mode }) {
   const [updateLoading, setUpdateLoading] = useState(false);
   const [profilePreview, setProfilePreview] = useState("");
   const [isProfileEditable, setIsProfileEditable] = useState(false);
-
+  const [isProcessing, setIsProcessing] = useState(false);
   const { userPosts: currentUserPosts } = useUser();
   const currentUserData = useSelector((state) => state.auth.userData);
   const loaderData = useLoaderData();
+  const [localFollow, setLocalFollow] = useState(
+    useSelector((state) =>
+      state.auth.userData.followees.includes(loaderData?.userId)
+    )
+  );
+
+  const globalFollow = useSelector((state) =>
+    state.auth.userData.followees.includes(loaderData?.userId)
+  );
+
   const [userData, setUserData] = useState({
     name: "",
     username: "",
@@ -75,12 +86,12 @@ function ProfilePage({ mode }) {
         userBio: loaderData.userBio,
       });
     }
-    setTimeout(() => setLoading(false), 200);
   }, [mode, currentUserData, currentUserPosts, loaderData]);
 
   useEffect(() => {
     setBio(userData.userBio);
     setUserCurrentProfile(userData.profileURL);
+    setTimeout(() => setLoading(false), 200);
   }, [userData]);
 
   const handleBioSave = async () => {
@@ -182,6 +193,45 @@ function ProfilePage({ mode }) {
       });
   };
 
+  const handleFollowClick = async () => {
+    console.log(localFollow);
+    if (isProcessing) return;
+    setIsProcessing(true);
+
+    if (localFollow) {
+      console.log("enter true");
+      setLocalFollow(false);
+      try {
+        await userServices.unfollow(loaderData.userId, currentUserData.userId);
+        console.log("DB called");
+        dispatch(
+          updateFollowees({
+            type: "remove",
+            authorId: loaderData.userId,
+          })
+        );
+      } catch (error) {
+        setLocalFollow(true);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else {
+      console.log("enter false");
+      setLocalFollow(true);
+      try {
+        console.log("else try");
+        await userServices.follow(loaderData.userId, currentUserData.userId);
+        dispatch(updateFollowees({ type: "add", authorId: loaderData.userId }));
+      } catch (error) {
+        console.log(error);
+        setLocalFollow(false);
+      } finally {
+        setIsProcessing(false);
+      }
+    }
+    console.log(localFollow);
+  };
+
   return loading ? (
     <div className="w-screen h-screen z-50 flex justify-center items-center bg-[var(--brand-color)] fixed top-0 left-0">
       <ThreeDot
@@ -206,7 +256,14 @@ function ProfilePage({ mode }) {
                 >
                   {isProfileEditable ? (
                     <>
-                      <button onClick={() => setIsProfileEditable(false)}>
+                      <button
+                        onClick={() => {
+                          setIsProfileEditable(false);
+                          setProfileInput("");
+                          setUpdateLoading(false);
+                          setProfilePreview("");
+                        }}
+                      >
                         <X />
                       </button>
                       <button onClick={updateProfilePic}>
@@ -239,7 +296,9 @@ function ProfilePage({ mode }) {
                       />
                     ) : (
                       <ImagePlusIcon
-                        className={`${previewLoading ? "hidden" : ""} w-[50%]`}
+                        className={`${
+                          previewLoading ? "hidden" : ""
+                        } w-[50%] z-20`}
                       />
                     )}
                     <input
@@ -254,7 +313,7 @@ function ProfilePage({ mode }) {
                         previewLoading ? "" : "hidden"
                       } absolute h-full w-full bg-white flex justify-center items-center z-10 `}
                     >
-                      <FourSquare size="small" color={"var(--brand-color)"} />
+                      <ThreeDot size="small" color={"var(--brand-color)"} />
                     </div>
                   </div>
                 ) : userCurrentProfile ? (
@@ -300,26 +359,14 @@ function ProfilePage({ mode }) {
             {mode !== "current" &&
               currentUserData.userId !== loaderData.userId && (
                 <button
-                  onClick={() => {
-                    Toastify({
-                      text: "Follow feature will be available soon",
-                      duration: 3000,
-                      gravity: "top",
-                      position: "right",
-                      style: {
-                        background: "var(--brand-color)",
-                        color: "#fff",
-                        borderRadius: "10px",
-                        boxShadow: "0 0 12px rgba(255,255,255,0.8)",
-                        fontWeight: "300",
-                        border: "1px solid var(--brand-color)",
-                        fontSize: "12px",
-                      },
-                    }).showToast();
-                  }}
-                  className="cursor-pointer text-xs lg:text-lg  uppercase bg-[var(--brand-color)] text-white w-36 py-1 rounded"
+                  onClick={handleFollowClick}
+                  className={`cursor-pointer text-xs lg:text-lg  uppercase ${
+                    localFollow
+                      ? "text-[var(--brand-color)] font-bold border-2 border-[var(--brand-color)]"
+                      : " text-white bg-[var(--brand-color)]"
+                  }  w-36 py-1 rounded`}
                 >
-                  Follow
+                  {localFollow ? "Following" : "Follow"}
                 </button>
               )}
           </div>
@@ -332,12 +379,16 @@ function ProfilePage({ mode }) {
             color={["#000000", "#082828", "#115252", "#1a7c7c"]}
           />
         ) : (
-          <div className={`${userData.userBio ? "" : "hidden"} `}>
+          <div
+            className={`${
+              !userData.userBio && mode != "current" ? "hidden" : ""
+            } `}
+          >
             <span
               className={`font-semibold text-xs lg:text-lg justify-start items-center gap-x-5 flex `}
             >
               <span>BIO</span>
-              <span className="flex gap-x-5">
+              <span className={`flex gap-x-5`}>
                 {editable ? (
                   <>
                     <Save
@@ -351,18 +402,11 @@ function ProfilePage({ mode }) {
                   </>
                 ) : (
                   <>
-                    {mode == "current" ? (
+                    {mode == "current" && (
                       <Edit2Icon
                         className="h-3 w-3 lg:h-5 cursor-pointer lg:w-5"
                         onClick={() => setEditable((prev) => !prev)}
                       />
-                    ) : (
-                      currentUserData.userId == loaderData.userId && (
-                        <Edit
-                          className="h-4 w-4 lg:h-5 cursor-pointer lg:w-5"
-                          onClick={() => setEditable((prev) => !prev)}
-                        />
-                      )
                     )}
                   </>
                 )}
@@ -408,7 +452,9 @@ function ProfilePage({ mode }) {
                 onClick={() => {
                   setLoading(true);
                   navigate(
-                    `/user/${currentUserData.userId}/post/${eachPost.$id}`
+                    `/user/${currentUserData.userId}/post/${
+                      eachPost.$id
+                    }?followeeList=${JSON.stringify(currentUserData.followees)}`
                   );
                   if (location.pathname.includes("post/")) setLoading(false);
                 }}

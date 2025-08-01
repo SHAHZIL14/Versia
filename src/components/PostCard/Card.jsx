@@ -30,6 +30,7 @@ function Card({ data, mode }) {
     postId: "",
     postMetaId: "",
     isLiked: false,
+    isFollowing: false,
   });
 
   const loaderData = useLoaderData();
@@ -45,7 +46,7 @@ function Card({ data, mode }) {
         const fetchedAuthorProfile = (
           await userServices.getUserInfo(data.authorId)
         ).profileSource;
-  
+
         setPostData({
           authorId: data.authorId,
           authorProfile: fetchedAuthorProfile,
@@ -58,12 +59,13 @@ function Card({ data, mode }) {
           postId: data.postId,
           postMetaId: data.$id,
           isLiked: data.isLiked,
+          isFollowing: data.isFollowing,
         });
       } else if (loaderData) {
         const fetchedAuthorProfile = (
           await userServices.getUserInfo(loaderData.authorId)
         ).profileSource;
-  
+
         setPostData({
           authorId: loaderData.authorId,
           authorProfile: fetchedAuthorProfile,
@@ -76,20 +78,20 @@ function Card({ data, mode }) {
           postId: loaderData.postId,
           postMetaId: loaderData.$id,
           isLiked: loaderData.isLiked,
+          isFollowing: loaderData.isFollowing,
         });
       }
     };
-  
-    fetchAuthorProfile(); // call the async function
+
+    fetchAuthorProfile();
   }, [mode, data, loaderData]);
-  
 
   useEffect(() => {
     if (postData && postData.postId) {
-      const cached = getPostLikeCache(postData.postId);
-      if (cached) {
-        setLikes(cached.likes);
-        setIsLiked(cached.isLiked);
+      const cachedLikes = getPostLikeCache(postData.postId);
+      if (cachedLikes) {
+        setLikes(cachedLikes.likes);
+        setIsLiked(cachedLikes.isLiked);
       } else {
         setLikes(postData.likes);
         setIsLiked(postData.isLiked);
@@ -182,12 +184,7 @@ function Card({ data, mode }) {
         mode === "specific" ? "min-h-screen w-screen" : "h-fit"
       } w-full flex-col flex text-xs md:text-sm lg:text-md mx-auto overflow-hidden border-blue-80 bg-white py-0`}
     >
-      <CardHeader
-        authorId={postData.authorId}
-        authorName={postData.name}
-        authorUserName={postData.username}
-        authorProfileURL={postData.authorProfile}
-      />
+      <CardHeader postData={postData} />
 
       <motion.div
         transition={{ type: "spring", stiffness: 500 }}
@@ -305,12 +302,15 @@ function Card({ data, mode }) {
 
 export default React.memo(Card);
 
-export const postInfoLoader = async ({ params }) => {
+export const postInfoLoader = async ({ params, request }) => {
   const { postId } = params;
   const { userId } = params;
+  const url = new URL(request.url);
+  const followees = JSON.parse(url.searchParams.get("followeeList") || "[]");
   const postData = await postServices.getPost(postId);
   const postMetaData = await postServices.getMetaPost(postData.$id);
   const isLiked = await postServices.getIsLiked(postData.$id, userId);
+  const isFollowing = followees?.includes(postData.authorId);
   const data = {
     authorId: postData.authorId,
     authorProfileURL: postMetaData.authorProfileURL,
@@ -323,6 +323,7 @@ export const postInfoLoader = async ({ params }) => {
     postId: postMetaData.postId,
     $id: postMetaData.$id,
     isLiked: false || isLiked,
+    isFollowing: false || isFollowing,
   };
   return data;
 };

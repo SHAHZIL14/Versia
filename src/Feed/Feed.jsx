@@ -8,12 +8,13 @@ import userServices from "../../services/User";
 import { addBatch, addPostLikes } from "../../store/Post/PostSlice";
 import { useUser } from "../../context/userContext";
 import { ThreeDot } from "react-loading-indicators";
+import { updateFollowees } from "../../store/authentication/authenticationSlice";
 
 const Feed = () => {
   const dispatch = useDispatch();
   const { setUserPosts } = useUser();
-
   const userId = useSelector((state) => state.auth.userData.userId);
+  const followees = useSelector((state) => state.auth.userData.followees);
   const storedPost = useSelector((state) => state.Post.data, shallowEqual);
   const storedPostLikes = useSelector(
     (state) => state.Post.likesMap,
@@ -22,13 +23,16 @@ const Feed = () => {
   const isFetched = useSelector((state) => state.Post.isFetched);
 
   const [loading, setLoading] = useState(!isFetched);
-
+  const [followeeList, setFolloweeList] = useState(null);
   useEffect(() => {
     if (!isFetched) {
       fetchPosts();
       fetchCurrentUserProfile();
+      getCurrentUserFolloweeList();
     }
   }, [isFetched, userId]);
+
+
 
   const fetchPosts = async () => {
     const post = (await postServices.getPostBatch()).documents;
@@ -65,6 +69,18 @@ const Feed = () => {
     if (userPosts) setUserPosts(userPosts);
   };
 
+  const getCurrentUserFolloweeList = async () => {
+    if (!userId) return;
+    try {
+      const followersDocs = await userServices.getUsersFollowee(userId);
+      const followeeIdList = followersDocs.map((doc) => doc.followeeId);
+      setFolloweeList(followeeIdList);
+      dispatch(updateFollowees(followeeIdList));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     if (storedPost?.length > 0) {
       getPostsLikes().then(() => setLoading(false));
@@ -86,6 +102,7 @@ const Feed = () => {
         postId: post.metaData.postId,
         $id: post.metaData.$id,
         isLiked: storedPostLikes[post.data.$id] === true,
+        isFollowing: false || followees.includes(post.data.authorId),
       };
 
       return (
@@ -99,8 +116,8 @@ const Feed = () => {
       <div className="fixed top-0 left-0 w-screen h-screen bg-[var(--brand-color)] flex flex-col gap-3 justify-center items-center z-[1000]">
         <ThreeDot color="white" textColor="white" />
         <p className="font-bold text-xs md:text-md tracking-wider uppercase">
-        Getting latest for you
-      </p>
+          Getting latest for you
+        </p>
       </div>
     );
   }

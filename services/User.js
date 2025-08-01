@@ -89,6 +89,57 @@ class UserSevices {
         }
     }
 
+    async getUsersFollowee(userId) {
+        try {
+            const followeeList = (await this.database.listDocuments(
+                config.databaseID,
+                config.followerCollectionID,
+                [
+                    Query.equal('followerId', userId)
+                ]
+            )).documents;
+            console.log(followeeList);
+            return followeeList;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async follow(followeeUserId, followerUserId) {
+        try {
+            return await this.database.createDocument(
+                config.databaseID,
+                config.followerCollectionID,
+                ID.unique(),
+                {
+                    followerId: followerUserId,
+                    followeeId: followeeUserId
+                }
+            );
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async unfollow(followeeUserId, followerUserId) {
+        try {
+            const followDocId = (await this.database.listDocuments(
+                config.databaseID,
+                config.followerCollectionID,
+                [
+                    Query.equal('followeeId', followeeUserId),
+                    Query.equal('followerId', followerUserId)
+                ]
+            )).documents[0].$id;
+            return await this.database.deleteDocument(
+                config.databaseID,
+                config.followerCollectionID,
+                followDocId
+            );
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 const userServices = new UserSevices();

@@ -49,7 +49,7 @@ const AuthWatcher = () => {
         console.warn(error);
         dispatch(setLoading(false));
       });
-  }, [refreshKey]); // ✅ Run only once on mount
+  }, [refreshKey]);
 
   const loading = useSelector((state) => state.auth.loading);
   return loading ? (

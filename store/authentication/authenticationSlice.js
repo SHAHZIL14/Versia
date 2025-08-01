@@ -26,10 +26,30 @@ const authenticationSlice = createSlice({
         },
         updateProfile: function (state, action) {
             state.userData.profileSource = action.payload;
+        },
+        updateFollowees: function (state, action) {
+            if (state.userData.followees) {
+                const prev = state.userData.followees
+                switch (action.payload.type) {
+                    case 'add':
+                        if (prev.includes(action.payload.authorId)) return;
+                        state.userData.followees = [...prev, action.payload.authorId];
+                        break;
+                    case 'remove':
+                        state.userData.followees = prev.filter((id) => id != action.payload.authorId);
+                    default: ''
+                        break;
+                }
+            }
+            else {
+                state.userData.followees = action.payload
+            }
+
         }
+
     }
 });
 
-export const { logIn, logOut, setLoading, updateBio,updateProfile } = authenticationSlice.actions;
+export const { logIn, logOut, setLoading, updateBio, updateProfile, updateFollowees } = authenticationSlice.actions;
 
 export default authenticationSlice.reducer;
