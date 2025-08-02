@@ -1,13 +1,8 @@
-import {
-  useLoaderData,
-  useNavigate,
-  useFetcher,
-  useLocation,
-} from "react-router-dom";
+import { useLoaderData, useNavigate, useLocation } from "react-router-dom";
 import userServices from "../../../services/User";
 import { useDispatch, useSelector } from "react-redux";
 import { useUser } from "../../../context/userContext";
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import { ThreeDot, FourSquare } from "react-loading-indicators";
 import { motion } from "motion/react";
 import {
@@ -24,18 +19,24 @@ import {
   updateBio,
   updateProfile,
 } from "../../../store/authentication/authenticationSlice";
-import Toastify from "toastify-js";
 import "toastify-js/src/toastify.css";
 import imageCompression from "browser-image-compression";
 import heic2any from "heic2any";
 import { toast } from "react-toastify";
 import { updateFollowees } from "../../../store/authentication/authenticationSlice";
+import useFollowerStore from "../../../store/followers/followersStore";
 
 function ProfilePage({ mode }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const fetcher = useFetcher();
   const location = useLocation();
+  const {
+    followersMap,
+    incrementFollower,
+    decrementFollower,
+    incrementFollowing,
+    decrementFollowing,
+  } = useFollowerStore();
   const [loading, setLoading] = useState(true);
   const [bioLoading, setBioLoading] = useState(false);
   const [bio, setBio] = useState("");
@@ -61,6 +62,7 @@ function ProfilePage({ mode }) {
   );
 
   const [userData, setUserData] = useState({
+    userId: null,
     name: "",
     username: "",
     profileURL: "",
@@ -68,9 +70,13 @@ function ProfilePage({ mode }) {
     userBio: "",
   });
 
+  const [followers, setFollowers] = useState(0);
+  const [following, setFollowing] = useState(0);
+
   useEffect(() => {
     if (mode === "current") {
       setUserData({
+        userId: currentUserData.userId,
         name: currentUserData.name,
         username: currentUserData.userName,
         profileURL: false || currentUserData.profileSource,
@@ -79,6 +85,7 @@ function ProfilePage({ mode }) {
       });
     } else {
       setUserData({
+        userId: loaderData.userId,
         name: loaderData.name,
         username: loaderData.username,
         profileURL: false || loaderData.profileURL,
@@ -91,8 +98,12 @@ function ProfilePage({ mode }) {
   useEffect(() => {
     setBio(userData.userBio);
     setUserCurrentProfile(userData.profileURL);
+    if (userData.userId) {
+      setFollowers(followersMap[userData.userId].followersCount);
+      setFollowing(followersMap[userData.userId].followingCount);
+    }
     setTimeout(() => setLoading(false), 200);
-  }, [userData]);
+  }, [userData, followersMap]);
 
   const handleBioSave = async () => {
     setEditable((prev) => !prev);
@@ -194,16 +205,16 @@ function ProfilePage({ mode }) {
   };
 
   const handleFollowClick = async () => {
-    console.log(localFollow);
+
     if (isProcessing) return;
     setIsProcessing(true);
 
     if (localFollow) {
-      console.log("enter true");
       setLocalFollow(false);
+      decrementFollower(userData.userId);
+      decrementFollowing(currentUserData.userId);
       try {
         await userServices.unfollow(loaderData.userId, currentUserData.userId);
-        console.log("DB called");
         dispatch(
           updateFollowees({
             type: "remove",
@@ -211,25 +222,29 @@ function ProfilePage({ mode }) {
           })
         );
       } catch (error) {
+        console.log(error);
         setLocalFollow(true);
+        incrementFollower(userData.userId);
+        incrementFollowing(currentUserData.userId);
       } finally {
         setIsProcessing(false);
       }
     } else {
-      console.log("enter false");
       setLocalFollow(true);
+      incrementFollower(userData.userId);
+      incrementFollowing(currentUserData.userId);
       try {
-        console.log("else try");
         await userServices.follow(loaderData.userId, currentUserData.userId);
         dispatch(updateFollowees({ type: "add", authorId: loaderData.userId }));
       } catch (error) {
         console.log(error);
         setLocalFollow(false);
+        decrementFollower(userData.userId);
+        decrementFollowing(currentUserData.userId);
       } finally {
         setIsProcessing(false);
       }
     }
-    console.log(localFollow);
   };
 
   return loading ? (
@@ -244,9 +259,9 @@ function ProfilePage({ mode }) {
       id="profile"
       className="min-h-screen w-screen flex flex-col gap-y-5 bg-white"
     >
-      <div className="flex flex-col text-[var(--brand-color)] py-3 px-2">
-        <div className="flex gap-0">
-          <div className="w-[50%] py-5 flex flex-col gap-5 justify-center items-start relative">
+      <div className="flex flex-col text-[var(--brand-color)] py-3 px-2  ">
+        <div className="flex gap-0 justify-between ">
+          <div className=" py-5 flex flex-col gap-5 justify-center items-start relative">
             <div className="flex items-center gap-3 flex-row-reverse">
               {mode == "current" && (
                 <div
@@ -345,15 +360,19 @@ function ProfilePage({ mode }) {
             </div>
           </div>
 
-          <div className="w-[50%] py-7 flex flex-col gap-5 items-center justify-start">
-            <div className="flex gap-x-5">
-              <div className="flex flex-col text-xs lg:text-lg  items-center p-1">
+          <div className=" py-7 flex flex-col gap-5 items-center justify-start">
+            <div className="flex flex-col xs:flex-row gap-5 xs:gap-x-5">
+              <div className="hidden xs:flex flex-col text-xs lg:text-lg  items-center p-1">
                 <span className="uppercase font-semibold">posts</span>
                 <span>{userData.userPosts?.length || 0}</span>
               </div>
               <div className="flex flex-col text-xs lg:text-lg  items-center p-1">
                 <span className="uppercase font-semibold">followers</span>
-                <span>0</span>
+                <span>{followers}</span>
+              </div>
+              <div className="flex flex-col text-xs lg:text-lg  items-center p-1">
+                <span className="uppercase font-semibold">following</span>
+                <span>{following}</span>
               </div>
             </div>
             {mode !== "current" &&

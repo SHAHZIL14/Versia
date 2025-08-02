@@ -7,8 +7,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { ThreeDot } from "react-loading-indicators";
 import userServices from "../../../services/User";
 import { updateFollowees } from "../../../store/authentication/authenticationSlice";
+import useFollowerStore from "../../../store/followers/followersStore";
 
 function CardHeader({ postData }) {
+  const {
+    incrementFollower,
+    decrementFollower,
+    incrementFollowing,
+    decrementFollowing,
+  } = useFollowerStore();
   const [localFollow, setLocalFollow] = useState(
     useSelector((state) =>
       state.auth.userData.followees.includes(postData.authorId)
@@ -29,9 +36,10 @@ function CardHeader({ postData }) {
   const handleFollowClick = async () => {
     if (isProcessing) return;
     setIsProcessing(true);
-
     if (localFollow) {
       setLocalFollow(false);
+      decrementFollower(postData.authorId);
+      decrementFollowing(userId);
       try {
         await userServices.unfollow(postData.authorId, userId);
         dispatch(
@@ -42,16 +50,22 @@ function CardHeader({ postData }) {
         );
       } catch (error) {
         setLocalFollow(true);
+        incrementFollower(postData.authorId);
+        incrementFollowing(userId);
       } finally {
         setIsProcessing(false);
       }
     } else {
       setLocalFollow(true);
+      incrementFollower(postData.authorId);
+      incrementFollowing(userId);
       try {
         await userServices.follow(postData.authorId, userId);
         dispatch(updateFollowees({ type: "add", authorId: postData.authorId }));
       } catch (error) {
         setLocalFollow(false);
+        decrementFollower(postData.authorId);
+        decrementFollowing(userId);
       } finally {
         setIsProcessing(false);
       }

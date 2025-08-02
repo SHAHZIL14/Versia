@@ -98,7 +98,6 @@ class UserSevices {
                     Query.equal('followerId', userId)
                 ]
             )).documents;
-            console.log(followeeList);
             return followeeList;
         } catch (error) {
             throw error;
@@ -107,7 +106,7 @@ class UserSevices {
 
     async follow(followeeUserId, followerUserId) {
         try {
-            return await this.database.createDocument(
+            await this.database.createDocument(
                 config.databaseID,
                 config.followerCollectionID,
                 ID.unique(),
@@ -116,6 +115,35 @@ class UserSevices {
                     followeeId: followeeUserId
                 }
             );
+
+            const prevFollowers = (await this.database.getDocument(
+                config.databaseID,
+                config.userCollectionID,
+                followeeUserId
+            )).followers;
+            await this.database.updateDocument(
+                config.databaseID,
+                config.userCollectionID,
+                followeeUserId,
+                {
+                    followers: prevFollowers + 1
+                }
+            )
+
+            const prevFollowing = (await this.database.getDocument(
+                config.databaseID,
+                config.userCollectionID,
+                followerUserId
+            )).following;
+            return await this.database.updateDocument(
+                config.databaseID,
+                config.userCollectionID,
+                followerUserId,
+                {
+                    following: prevFollowing + 1
+                }
+            )
+
         } catch (error) {
             throw error;
         }
@@ -131,11 +159,62 @@ class UserSevices {
                     Query.equal('followerId', followerUserId)
                 ]
             )).documents[0].$id;
-            return await this.database.deleteDocument(
+            await this.database.deleteDocument(
                 config.databaseID,
                 config.followerCollectionID,
                 followDocId
             );
+
+            const prevFollowing = (await this.database.getDocument(
+                config.databaseID,
+                config.userCollectionID,
+                followerUserId
+            )).following;
+            await this.database.updateDocument(
+                config.databaseID,
+                config.userCollectionID,
+                followerUserId,
+                {
+                    following: prevFollowing - 1
+                }
+            )
+
+            const prevFollowers = (await this.database.getDocument(
+                config.databaseID,
+                config.userCollectionID,
+                followeeUserId
+            )).followers;
+            return await this.database.updateDocument(
+                config.databaseID,
+                config.userCollectionID,
+                followeeUserId,
+                {
+                    followers: prevFollowers - 1
+                }
+            )
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getFollowersCountBatch(batchIds) {
+        try {
+            if (batchIds.length == 0) return;
+            const userDocs = (await this.database.listDocuments(
+                config.databaseID,
+                config.userCollectionID,
+                [
+                    Query.equal('$id', batchIds)
+                ]
+            )).documents;
+            return userDocs.map((doc) => {
+                return {
+                    id: doc.$id,
+                    follower: doc.followers,
+                    following: doc.following
+                }
+            });
         } catch (error) {
             throw error;
         }

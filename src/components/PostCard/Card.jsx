@@ -182,118 +182,120 @@ function Card({ data, mode }) {
       viewport={{ once: true }}
       className={`${
         mode === "specific" ? "min-h-screen w-screen" : "h-fit"
-      } w-full flex-col flex text-xs md:text-sm lg:text-md mx-auto overflow-hidden border-blue-80 bg-white py-0`}
+      } w-full flex-col lg:items-center flex text-xs md:text-sm lg:text-md mx-auto overflow-hidden border-blue-80 bg-white py-0`}
     >
-      <CardHeader postData={postData} />
+      <div className="lg:w-96">
+        <CardHeader postData={postData} />
 
-      <motion.div
-        transition={{ type: "spring", stiffness: 500 }}
-        onDoubleClick={() => {
-          handlePostDoubleClick(postData.postId);
-          setShowDoubleTapHeart(true);
-          setTimeout(() => setShowDoubleTapHeart(false), 800);
-        }}
-        className={`${
-          mode === "specific"
-            ? "max-h-[75vh]"
-            : "max-h-[500px] lg:max-h-[800px]"
-        } relative featuredImage cursor-pointer overflow-hidden flex justify-center items-center bg-contain bg-no-repeat bg-center lg:rounded h-fit w-full`}
-      >
-        {postData.imageURL && (
-          <img
-            loading="lazy"
-            src={postData.imageURL}
-            className="w-full max-h-[500px] lg:max-h-[800px] object-cover object-center"
-            alt=""
-          />
-        )}
-        <AnimatePresence>
-          {showDoubleTapHeart && (
-            <motion.div
-              key="doubleTapHeart"
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 2, opacity: 1 }}
-              exit={{ scale: 2, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="absolute"
-            >
-              <Heart className="w-14 h-14 text-red-600/80 fill-red-600/80 drop-shadow-md" />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.div>
-
-      <div className="about-card flex flex-col gap-2">
-        <div className="actions flex justify-start gap-x-5 border pt-2 px-2">
-          <motion.button
-            whileTap={{ scale: 2 }}
-            transition={{ type: "spring", stiffness: 500 }}
-            onClick={() => handleHeartClick(postData.postId)}
-            className="cursor-pointer"
-          >
-            <Heart
-              className={`${
-                isLiked
-                  ? "fill-red-500 text-red-500"
-                  : "text-[var(--brand-color)]"
-              } transition ease-in-out duration-500 w-5 h-5 hover:fill-red-500`}
+        <motion.div
+          transition={{ type: "spring", stiffness: 500 }}
+          onDoubleClick={() => {
+            handlePostDoubleClick(postData.postId);
+            setShowDoubleTapHeart(true);
+            setTimeout(() => setShowDoubleTapHeart(false), 800);
+          }}
+          className={`${
+            mode === "specific"
+              ? "max-h-[75vh]"
+              : "max-h-[500px] lg:max-h-[800px]"
+          } relative featuredImage cursor-pointer overflow-hidden flex justify-center items-center bg-contain bg-no-repeat bg-center lg:rounded h-fit w-full`}
+        >
+          {postData.imageURL && (
+            <img
+              loading="lazy"
+              src={postData.imageURL}
+              className="w-full max-h-[500px] lg:max-h-[800px] object-cover object-center"
+              alt=""
             />
-          </motion.button>
-          <button
-            onClick={() =>
-              Toastify({
-                text: "Comment feature will be available soon",
-                duration: 3000,
-                gravity: "top",
-                position: "right",
-                style: {
-                  background: "var(--brand-color)",
-                  color: "#fff",
-                  borderRadius: "10px",
-                  boxShadow: "0 0 12px rgba(255,255,255,0.8)",
-                  fontWeight: "300",
-                  border: "1px solid var(--brand-color)",
-                  fontSize: "12px",
-                },
-              }).showToast()
-            }
-          >
-            <MessageCircle className="w-5 h-5 text-[var(--brand-color)] hover:fill-gray-500" />
-          </button>
-          <button
-            onClick={() =>
-              Toastify({
-                text: "Share feature will be available soon",
-                duration: 3000,
-                gravity: "top",
-                position: "right",
-                style: {
-                  background: "var(--brand-color)",
-                  color: "#fff",
-                  borderRadius: "10px",
-                  boxShadow: "0 0 12px rgba(255,255,255,0.8)",
-                  fontWeight: "300",
-                  border: "1px solid var(--brand-color)",
-                  fontSize: "12px",
-                },
-              }).showToast()
-            }
-          >
-            <Share className="w-5 h-5 text-[var(--brand-color)] hover:fill-gray-500" />
-          </button>
-        </div>
+          )}
+          <AnimatePresence>
+            {showDoubleTapHeart && (
+              <motion.div
+                key="doubleTapHeart"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 2, opacity: 1 }}
+                exit={{ scale: 2, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                className="absolute"
+              >
+                <Heart className="w-14 h-14 text-red-600/80 fill-red-600/80 drop-shadow-md" />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
 
-        <div className="action-data text-black flex gap-x-3 px-2">
-          <div>
-            <strong>{likes}</strong> likes
+        <div className="about-card flex flex-col gap-2">
+          <div className="actions flex justify-start gap-x-5 border pt-2 px-2">
+            <motion.button
+              whileTap={{ scale: 2 }}
+              transition={{ type: "spring", stiffness: 500 }}
+              onClick={() => handleHeartClick(postData.postId)}
+              className="cursor-pointer"
+            >
+              <Heart
+                className={`${
+                  isLiked
+                    ? "fill-red-500 text-red-500"
+                    : "text-[var(--brand-color)]"
+                } transition ease-in-out duration-500 w-5 h-5 hover:fill-red-500`}
+              />
+            </motion.button>
+            <button
+              onClick={() =>
+                Toastify({
+                  text: "Comment feature will be available soon",
+                  duration: 3000,
+                  gravity: "top",
+                  position: "right",
+                  style: {
+                    background: "var(--brand-color)",
+                    color: "#fff",
+                    borderRadius: "10px",
+                    boxShadow: "0 0 12px rgba(255,255,255,0.8)",
+                    fontWeight: "300",
+                    border: "1px solid var(--brand-color)",
+                    fontSize: "12px",
+                  },
+                }).showToast()
+              }
+            >
+              <MessageCircle className="w-5 h-5 text-[var(--brand-color)] hover:fill-gray-500" />
+            </button>
+            <button
+              onClick={() =>
+                Toastify({
+                  text: "Share feature will be available soon",
+                  duration: 3000,
+                  gravity: "top",
+                  position: "right",
+                  style: {
+                    background: "var(--brand-color)",
+                    color: "#fff",
+                    borderRadius: "10px",
+                    boxShadow: "0 0 12px rgba(255,255,255,0.8)",
+                    fontWeight: "300",
+                    border: "1px solid var(--brand-color)",
+                    fontSize: "12px",
+                  },
+                }).showToast()
+              }
+            >
+              <Share className="w-5 h-5 text-[var(--brand-color)] hover:fill-gray-500" />
+            </button>
           </div>
-          <div>
-            <strong>{postData.comments}</strong> comments
-          </div>
-        </div>
 
-        <div className="caption text-black px-2 pb-5">
-          <p className="text-sm lg:text-base">{postData.caption}</p>
+          <div className="action-data text-black flex gap-x-3 px-2">
+            <div>
+              <strong>{likes}</strong> likes
+            </div>
+            <div>
+              <strong>{postData.comments}</strong> comments
+            </div>
+          </div>
+
+          <div className="caption text-black px-2 pb-5">
+            <p className="text-sm lg:text-base">{postData.caption}</p>
+          </div>
         </div>
       </div>
     </motion.div>

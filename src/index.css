@@ -1,8 +1,15 @@
 @import 'tailwindcss';
 
+
+@theme {
+  --breakpoint-xs: 380px;
+  --breakpoint-2xl: 100rem;
+  --breakpoint-3xl: 120rem;
+}
+
 :root {
   /* rgb(0, 63, 141) */
-  --brand-color:  #005d77;
+  --brand-color: #005d77;
   font-family: 'Inter', sans-serif;
   line-height: 1.5;
   font-weight: 400;

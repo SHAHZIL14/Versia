@@ -9,12 +9,14 @@ import { addBatch, addPostLikes } from "../../store/Post/PostSlice";
 import { useUser } from "../../context/userContext";
 import { ThreeDot } from "react-loading-indicators";
 import { updateFollowees } from "../../store/authentication/authenticationSlice";
+import useFollowerStore from "../../store/followers/followersStore";
 
 const Feed = () => {
   const dispatch = useDispatch();
   const { setUserPosts } = useUser();
-  const userId = useSelector((state) => state.auth.userData.userId);
-  const followees = useSelector((state) => state.auth.userData.followees);
+  const { setFollowerCount, followersMap } = useFollowerStore();
+  const userId = useSelector((state) => state.auth.userData?.userId);
+  const followees = useSelector((state) => state.auth.userData?.followees);
   const storedPost = useSelector((state) => state.Post.data, shallowEqual);
   const storedPostLikes = useSelector(
     (state) => state.Post.likesMap,
@@ -31,8 +33,6 @@ const Feed = () => {
       getCurrentUserFolloweeList();
     }
   }, [isFetched, userId]);
-
-
 
   const fetchPosts = async () => {
     const post = (await postServices.getPostBatch()).documents;
@@ -81,9 +81,23 @@ const Feed = () => {
     }
   };
 
+  const getFollowersCount = async () => {
+    if (Object.keys(followersMap).length != 0) return;
+    const authorIds = storedPost.map((post) => post?.data?.authorId);
+    if (!userId || authorIds.length === 0) return;
+    const uniqueAuthorIds = [...new Set(authorIds)];
+    const followersCount = await userServices.getFollowersCountBatch(
+      uniqueAuthorIds
+    );
+    followersCount.forEach((doc) => {
+      setFollowerCount(doc.id, doc.follower, doc.following);
+    });
+  };
+
   useEffect(() => {
     if (storedPost?.length > 0) {
       getPostsLikes().then(() => setLoading(false));
+      getFollowersCount();
     }
   }, [storedPost, userId]);
 
@@ -102,7 +116,7 @@ const Feed = () => {
         postId: post.metaData.postId,
         $id: post.metaData.$id,
         isLiked: storedPostLikes[post.data.$id] === true,
-        isFollowing: false || followees.includes(post.data.authorId),
+        isFollowing: false || followees?.includes(post.data.authorId),
       };
 
       return (
