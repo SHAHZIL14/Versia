@@ -51,14 +51,15 @@ function ProfilePage({ mode }) {
   const { userPosts: currentUserPosts } = useUser();
   const currentUserData = useSelector((state) => state.auth.userData);
   const loaderData = useLoaderData();
-  const [localFollow, setLocalFollow] = useState(
-    useSelector((state) =>
-      state.auth.userData.followees.includes(loaderData?.userId)
-    )
+  const isFollowing = useSelector((state) =>
+    state.auth.userData?.followees?.includes(loaderData?.userId)
   );
+  const [localFollow, setLocalFollow] = useState(isFollowing);
 
-  const globalFollow = useSelector((state) =>
-    state.auth.userData.followees.includes(loaderData?.userId)
+  const globalFollow = useSelector(
+    (state) =>
+      !!loaderData?.userId &&
+      state.auth.userData?.followees?.includes(loaderData.userId)
   );
 
   const [userData, setUserData] = useState({
@@ -205,7 +206,6 @@ function ProfilePage({ mode }) {
   };
 
   const handleFollowClick = async () => {
-
     if (isProcessing) return;
     setIsProcessing(true);
 

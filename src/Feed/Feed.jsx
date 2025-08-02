@@ -116,7 +116,10 @@ const Feed = () => {
         postId: post.metaData.postId,
         $id: post.metaData.$id,
         isLiked: storedPostLikes[post.data.$id] === true,
-        isFollowing: false || followees?.includes(post.data.authorId),
+        isFollowing:
+          Array.isArray(followees) && post.data?.authorId
+            ? followees.includes(post.data.authorId)
+            : false,
       };
 
       return (

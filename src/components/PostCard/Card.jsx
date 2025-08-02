@@ -197,7 +197,7 @@ function Card({ data, mode }) {
           className={`${
             mode === "specific"
               ? "max-h-[75vh]"
-              : "max-h-[500px] lg:max-h-[800px]"
+              : "max-h-[400px] lg:max-h-[800px]"
           } relative featuredImage cursor-pointer overflow-hidden flex justify-center items-center bg-contain bg-no-repeat bg-center lg:rounded h-fit w-full`}
         >
           {postData.imageURL && (
@@ -312,7 +312,11 @@ export const postInfoLoader = async ({ params, request }) => {
   const postData = await postServices.getPost(postId);
   const postMetaData = await postServices.getMetaPost(postData.$id);
   const isLiked = await postServices.getIsLiked(postData.$id, userId);
-  const isFollowing = followees?.includes(postData.authorId);
+  const isFollowing =
+    Array.isArray(followees) && postData?.authorId
+      ? followees.includes(postData.authorId)
+      : false;
+
   const data = {
     authorId: postData.authorId,
     authorProfileURL: postMetaData.authorProfileURL,

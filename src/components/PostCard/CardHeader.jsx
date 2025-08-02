@@ -16,15 +16,11 @@ function CardHeader({ postData }) {
     incrementFollowing,
     decrementFollowing,
   } = useFollowerStore();
-  const [localFollow, setLocalFollow] = useState(
-    useSelector((state) =>
-      state.auth.userData.followees.includes(postData.authorId)
-    )
+  const globalFollow = useSelector((state) =>
+    state.auth.userData?.followees?.includes(postData?.authorId)
   );
 
-  const globalFollow = useSelector((state) =>
-    state.auth.userData.followees.includes(postData.authorId)
-  );
+  const [localFollow, setLocalFollow] = useState(globalFollow);
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [loading, setLoading] = useState(false);
