@@ -361,8 +361,8 @@ function ProfilePage({ mode }) {
           </div>
 
           <div className=" py-7 flex flex-col gap-5 items-center justify-start">
-            <div className="flex flex-col xs:flex-row gap-5 xs:gap-x-5">
-              <div className="hidden xs:flex flex-col text-xs lg:text-lg  items-center p-1">
+            <div className="flex flex-col mx-5 xs:m-0 xs:flex-row  gap-5 xs:gap-x-5">
+              <div className="hidden sm:flex flex-col text-xs lg:text-lg  items-center p-1">
                 <span className="uppercase font-semibold">posts</span>
                 <span>{userData.userPosts?.length || 0}</span>
               </div>

@@ -30,7 +30,6 @@ function Card({ data, mode }) {
     postId: "",
     postMetaId: "",
     isLiked: false,
-    isFollowing: false,
   });
 
   const loaderData = useLoaderData();
@@ -59,7 +58,6 @@ function Card({ data, mode }) {
           postId: data.postId,
           postMetaId: data.$id,
           isLiked: data.isLiked,
-          isFollowing: data.isFollowing,
         });
       } else if (loaderData) {
         const fetchedAuthorProfile = (
@@ -78,7 +76,6 @@ function Card({ data, mode }) {
           postId: loaderData.postId,
           postMetaId: loaderData.$id,
           isLiked: loaderData.isLiked,
-          isFollowing: loaderData.isFollowing,
         });
       }
     };
@@ -197,7 +194,7 @@ function Card({ data, mode }) {
           className={`${
             mode === "specific"
               ? "max-h-[75vh]"
-              : "max-h-[400px] lg:max-h-[800px]"
+              : "max-h-[400px] lg:max-h-[600px]"
           } relative featuredImage cursor-pointer overflow-hidden flex justify-center items-center bg-contain bg-no-repeat bg-center lg:rounded h-fit w-full`}
         >
           {postData.imageURL && (
@@ -312,10 +309,6 @@ export const postInfoLoader = async ({ params, request }) => {
   const postData = await postServices.getPost(postId);
   const postMetaData = await postServices.getMetaPost(postData.$id);
   const isLiked = await postServices.getIsLiked(postData.$id, userId);
-  const isFollowing =
-    Array.isArray(followees) && postData?.authorId
-      ? followees.includes(postData.authorId)
-      : false;
 
   const data = {
     authorId: postData.authorId,
@@ -329,7 +322,6 @@ export const postInfoLoader = async ({ params, request }) => {
     postId: postMetaData.postId,
     $id: postMetaData.$id,
     isLiked: false || isLiked,
-    isFollowing: false || isFollowing,
   };
   return data;
 };
