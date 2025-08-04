@@ -355,7 +355,7 @@ function ProfilePage({ mode }) {
             </div>
 
             <div>
-              <p className="text-xs lg:text-lg font-semibold">
+              <p className="text-xs lg:text-lg font-semibold dark:text-[var(--brand-color-dark)]">
                 {userData.name}
               </p>
               <p className="text-xs lg:text-lg ">@{userData.username}</p>
@@ -369,7 +369,7 @@ function ProfilePage({ mode }) {
                 <span>{userData.userPosts?.length || 0}</span>
               </div>
               <div className="flex flex-col text-xs lg:text-lg  items-center p-1">
-                <span className="uppercase font-semibold">followers</span>
+                <span className="uppercase font-semibold ">followers</span>
                 <span>{followers}</span>
               </div>
               <div className="flex flex-col text-xs lg:text-lg  items-center p-1">
@@ -408,7 +408,7 @@ function ProfilePage({ mode }) {
             <span
               className={`font-semibold text-xs lg:text-lg justify-start items-center gap-x-5 flex `}
             >
-              <span>BIO</span>
+              <span className="dark:text-[var(--brand-color-dark)]">BIO</span>
               <span className={`flex gap-x-5`}>
                 {editable ? (
                   <>
