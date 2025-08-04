@@ -324,9 +324,9 @@ function Card({ data, mode }) {
               <span>{postData.caption}</span>
             </p>
             <p className=" lg:text-base flex gap-x-[2px] capitalize ">
-              <span className="text-sm">{postData.createdAt["date"]}</span>
-              <span className="text-sm">{postData.createdAt["month"]}</span>
-              <span className="text-sm">{postData.createdAt["year"]}</span>
+              <span className="text-xs">{postData.createdAt["date"]}</span>
+              <span className="text-xs">{postData.createdAt["month"]}</span>
+              <span className="text-xs">{postData.createdAt["year"]}</span>
             </p>
           </div>
         </div>
