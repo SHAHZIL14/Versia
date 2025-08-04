@@ -318,10 +318,10 @@ function Card({ data, mode }) {
             </div>
           </div>
 
-          <div className={`caption text-black dark:text-[var(--dark-text)] px-2 `}>
-            <p className={`${postData.caption?'':"hidden"}  text-sm lg:text-base flex gap-1`}>
-              <span className="font-bold">{postData.username}</span>
-              <span>{postData.caption}</span>
+          <div className={`caption text-black dark:text-[var(--dark-text)] px-2 flex flex-col gap-1 `}>
+            <p className={`${postData.caption?'':"hidden"}  text-sm lg:text-base `}>
+              <strong className="mr-2">{postData.username}</strong> 
+              {postData.caption}
             </p>
             <p className=" lg:text-base flex gap-x-[2px] capitalize ">
               <span className="text-xs">{postData.createdAt["date"]}</span>
