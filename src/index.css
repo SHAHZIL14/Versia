@@ -1,5 +1,5 @@
 @import 'tailwindcss';
-
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
   --breakpoint-xs: 320px;
@@ -11,6 +11,9 @@
 :root {
   /* rgb(0, 63, 141) */
   --brand-color: #005d77;
+  --brand-color-dark: #0081a5;
+  --dark-bg: #151515;
+  --dark-text: #ffffff;
   font-family: 'Inter', sans-serif;
   line-height: 1.5;
   font-weight: 400;

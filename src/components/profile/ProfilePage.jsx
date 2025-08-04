@@ -248,18 +248,18 @@ function ProfilePage({ mode }) {
   };
 
   return loading ? (
-    <div className="w-screen h-screen z-50 flex justify-center items-center bg-[var(--brand-color)] fixed top-0 left-0">
+    <div className="w-screen h-screen z-50 flex justify-center items-center bg-[var(--brand-color)] transition-colors duration-300 dark:bg-[var(--dark-bg)] fixed top-0 left-0">
       <ThreeDot
-        color={["#cccccc", "#e6e6e6", "#ffffff", "#ffffff"]}
+        color={`white`}
         textColor="white"
       />
     </div>
   ) : (
     <div
       id="profile"
-      className="min-h-screen w-screen flex flex-col gap-y-5 bg-white"
+      className="min-h-screen w-screen flex flex-col gap-y-5 bg-white transition-colors duration-300 dark:bg-[var(--dark-bg)]"
     >
-      <div className="flex flex-col text-[var(--brand-color)] py-3 px-2  ">
+      <div className="transition-colors duration-300 flex flex-col text-[var(--brand-color)] dark:text-[var(--dark-text)] py-3 px-2  ">
         <div className="flex gap-0 justify-between ">
           <div className=" py-5 flex flex-col gap-5 justify-center items-start relative">
             <div className="flex items-center gap-3 flex-row-reverse">
@@ -299,8 +299,10 @@ function ProfilePage({ mode }) {
                     onClick={() =>
                       document.getElementById("profileChange").click()
                     }
-                    className={`h-24 w-24 lg:w-38 lg:h-38 rounded-full ${
-                      profilePreview ? "" : "border border-[var(--brand-color)]"
+                    className={`transition-colors duration-300 h-24 w-24 lg:w-38 lg:h-38 rounded-full ${
+                      profilePreview
+                        ? ""
+                        : "border border-[var(--brand-color)] dark:border-[var(--dark-text)]"
                     } flex justify-center items-center overflow-hidden relative `}
                   >
                     {profilePreview ? (
@@ -347,7 +349,7 @@ function ProfilePage({ mode }) {
                   updateLoading ? "" : "hidden"
                 }  h-24 w-24 flex flex-col justify-center items-center rounded-full `}
               >
-                <FourSquare size="small" color="var(--brand-color)" />
+                <FourSquare size="small" color={"var(--brand-color)"} />
                 <p className="text-xs md:text-md">updating...</p>
               </div>
             </div>
@@ -379,10 +381,10 @@ function ProfilePage({ mode }) {
               currentUserData.userId !== loaderData.userId && (
                 <button
                   onClick={handleFollowClick}
-                  className={`cursor-pointer text-xs lg:text-lg  uppercase ${
+                  className={`transition-colors duration-300 cursor-pointer text-xs lg:text-lg  uppercase ${
                     localFollow
-                      ? "text-[var(--brand-color)] font-bold border-2 border-[var(--brand-color)]"
-                      : " text-white bg-[var(--brand-color)]"
+                      ? "text-[var(--brand-color)] dark:text-[var(--brand-color-dark)] font-bold border-2 border-[var(--brand-color)] dark:border-[var(--brand-color-dark)]"
+                      : " text-white bg-[var(--brand-color)] "
                   }  w-36 py-1 rounded`}
                 >
                   {localFollow ? "Following" : "Follow"}
@@ -395,7 +397,7 @@ function ProfilePage({ mode }) {
           <FourSquare
             size="small"
             speedPlus={2}
-            color={["#000000", "#082828", "#115252", "#1a7c7c"]}
+            color={"var(--brand-color) "}
           />
         ) : (
           <div
@@ -435,7 +437,7 @@ function ProfilePage({ mode }) {
               <textarea
                 className={`${
                   editable
-                    ? "border-b border-black/10 caret-[var(--brand-color)]"
+                    ? "border-b border-black/10 caret-[var(--brand-color)] "
                     : ""
                 } resize-none mt-1 w-full wrap-anywhere h-fit font-medium focus:ring-0  outline-none`}
                 type="text"
@@ -450,14 +452,14 @@ function ProfilePage({ mode }) {
       </div>
 
       {userData.userPosts.length == 0 ? (
-        <motion.div className="w-full text-[var(--brand-color)] flex flex-col items-center justify-center lg:text-lg text-xs gap-3  text-center">
+        <motion.div className="transition-colors duration-300 w-full text-[var(--brand-color)] dark:text-[var(--dark-text)] flex flex-col items-center justify-center lg:text-lg text-xs gap-3  text-center">
           <p>No post uploaded yet</p>
           <motion.button
             onClick={() => {
               navigate("/add-post");
             }}
           >
-            <Camera color="var(--brand-color)" />
+            <Camera color="var(--brand-color) " />
           </motion.button>
         </motion.div>
       ) : (

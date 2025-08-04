@@ -30,6 +30,7 @@ function Card({ data, mode }) {
     postId: "",
     postMetaId: "",
     isLiked: false,
+    createdAt: null,
   });
 
   const loaderData = useLoaderData();
@@ -58,6 +59,7 @@ function Card({ data, mode }) {
           postId: data.postId,
           postMetaId: data.$id,
           isLiked: data.isLiked,
+          createdAt: formatDate(data.createdAt),
         });
       } else if (loaderData) {
         const fetchedAuthorProfile = (
@@ -76,6 +78,7 @@ function Card({ data, mode }) {
           postId: loaderData.postId,
           postMetaId: loaderData.$id,
           isLiked: loaderData.isLiked,
+          createdAt: formatDate(loaderData.createdAt),
         });
       }
     };
@@ -164,8 +167,33 @@ function Card({ data, mode }) {
       });
   };
 
+  const formatDate = (createdAt) => {
+    const monthMap = [
+      "jan",
+      "feb",
+      "mar",
+      "apr",
+      "may",
+      "june",
+      "july",
+      "aug",
+      "sep",
+      "oct",
+      "nov",
+      "dec",
+    ];
+
+    const [year, month, day] = createdAt.split("T")[0].split("-");
+
+    return {
+      date: String(Number(day)),
+      month: monthMap[Number(month) - 1],
+      year: year.slice(2),
+    };
+  };
+
   return loading ? (
-    <div className="w-screen h-screen flex flex-col gap-3 justify-center items-center bg-[var(--brand-color)] fixed top-0 left-0">
+    <div className="w-screen h-screen flex flex-col gap-3 justify-center items-center bg-[var(--brand-color)] dark:bg-[var(--dark-bg)] fixed top-0 left-0">
       <ThreeDot size="small" color="white" textColor="white" />
       <p className="font-bold text-xs md:text-md tracking-wider uppercase">
         Almost there
@@ -179,9 +207,9 @@ function Card({ data, mode }) {
       viewport={{ once: true }}
       className={`${
         mode === "specific" ? "min-h-screen w-screen" : "h-fit"
-      } w-full flex-col lg:items-center flex text-xs md:text-sm lg:text-md mx-auto overflow-hidden border-blue-80 bg-white py-0`}
+      } w-full flex-col lg:items-center flex text-xs md:text-sm lg:text-md mx-auto overflow-hidden border-blue-80 pb-5 transition-colors duration-300 dark:bg-[var(--dark-bg)]`}
     >
-      <div className="lg:w-96">
+      <div className="lg:w-96 ">
         <CardHeader postData={postData} />
 
         <motion.div
@@ -222,7 +250,7 @@ function Card({ data, mode }) {
         </motion.div>
 
         <div className="about-card flex flex-col gap-2">
-          <div className="actions flex justify-start gap-x-5 border pt-2 px-2">
+          <div className="actions flex justify-start gap-x-5  pt-2 px-2">
             <motion.button
               whileTap={{ scale: 2 }}
               transition={{ type: "spring", stiffness: 500 }}
@@ -233,7 +261,7 @@ function Card({ data, mode }) {
                 className={`${
                   isLiked
                     ? "fill-red-500 text-red-500"
-                    : "text-[var(--brand-color)]"
+                    : "text-[var(--brand-color)] dark:text-[var(--brand-color-dark)]   "
                 } transition ease-in-out duration-500 w-5 h-5 hover:fill-red-500`}
               />
             </motion.button>
@@ -256,7 +284,7 @@ function Card({ data, mode }) {
                 }).showToast()
               }
             >
-              <MessageCircle className="w-5 h-5 text-[var(--brand-color)] hover:fill-gray-500" />
+              <MessageCircle className="w-5 h-5 text-[var(--brand-color)] dark:text-[var(--brand-color-dark)]  hover:fill-gray-500" />
             </button>
             <button
               onClick={() =>
@@ -277,11 +305,11 @@ function Card({ data, mode }) {
                 }).showToast()
               }
             >
-              <Share className="w-5 h-5 text-[var(--brand-color)] hover:fill-gray-500" />
+              <Share className="w-5 h-5 text-[var(--brand-color)] dark:text-[var(--brand-color-dark)]  hover:fill-gray-500" />
             </button>
           </div>
 
-          <div className="action-data text-black flex gap-x-3 px-2">
+          <div className="action-data text-black dark:text-[var(--dark-text)] flex gap-x-3 px-2">
             <div>
               <strong>{likes}</strong> likes
             </div>
@@ -290,8 +318,16 @@ function Card({ data, mode }) {
             </div>
           </div>
 
-          <div className="caption text-black px-2 pb-5">
-            <p className="text-sm lg:text-base">{postData.caption}</p>
+          <div className={`caption text-black dark:text-[var(--dark-text)] px-2 `}>
+            <p className={`${postData.caption?'':"hidden"}  text-sm lg:text-base flex gap-1`}>
+              <span className="font-bold">{postData.username}</span>
+              <span>{postData.caption}</span>
+            </p>
+            <p className=" lg:text-base flex gap-x-[2px] capitalize ">
+              <span className="text-sm">{postData.createdAt["date"]}</span>
+              <span className="text-sm">{postData.createdAt["month"]}</span>
+              <span className="text-sm">{postData.createdAt["year"]}</span>
+            </p>
           </div>
         </div>
       </div>
@@ -322,6 +358,7 @@ export const postInfoLoader = async ({ params, request }) => {
     postId: postMetaData.postId,
     $id: postMetaData.$id,
     isLiked: false || isLiked,
+    createdAt: postData.$createdAt,
   };
   return data;
 };

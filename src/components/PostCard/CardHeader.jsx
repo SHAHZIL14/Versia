@@ -109,7 +109,7 @@ function CardHeader({ postData }) {
                 />
               )}
             </div>
-            <div className="about-author flex flex-col  justify-center text-black">
+            <div className="about-author flex flex-col  justify-center transition-colors duration-300 text-black dark:text-[var(--dark-text)]">
               <span className="text-sm/tight font-medium">{postData.name}</span>
               <span className="text-xs">{`@${postData.username}`}</span>
             </div>
@@ -121,8 +121,8 @@ function CardHeader({ postData }) {
             postData.authorId == userId ? "hidden" : ""
           }  ${
             localFollow
-              ? "bg-white  text-[var(--brand-color)] font-medium"
-              : "bg-[var(--brand-color)]"
+              ? "text-[var(--brand-color)] transition-colors duration-300 dark:text-[var(--brand-color-dark)]  font-medium"
+              : "text-[var(--dark-text)] bg-[var(--brand-color)] "
           }  py-1 px-2 text-sm rounded-lg cursor-pointer `}
         >
           <button

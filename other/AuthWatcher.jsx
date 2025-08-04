@@ -53,7 +53,7 @@ const AuthWatcher = () => {
 
   const loading = useSelector((state) => state.auth.loading);
   return loading ? (
-    <div className="w-screen h-screen gap-3 flex flex-col justify-center items-center bg-[var(--brand-color)] fixed top-0 left-0">
+    <div className="w-screen h-screen gap-3 flex flex-col justify-center items-center bg-[var(--brand-color)] transition-colors duration-300 dark:bg-[var(--dark-bg)]  fixed top-0 left-0">
       <ThreeDot size="small" color="white" textColor="white" />
       <p className="font-bold text-xs md:text-md tracking-wider uppercase">
         recognizing you 

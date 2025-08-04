@@ -120,6 +120,7 @@ const Feed = () => {
           Array.isArray(followees) && post.data?.authorId
             ? followees.includes(post.data.authorId)
             : false,
+        createdAt:post.data.$createdAt
       };
 
       return (
@@ -130,7 +131,7 @@ const Feed = () => {
 
   if (loading) {
     return (
-      <div className="fixed top-0 left-0 w-screen h-screen bg-[var(--brand-color)] flex flex-col gap-3 justify-center items-center z-[1000]">
+      <div className="fixed top-0 left-0 w-screen h-screen bg-[var(--brand-color)] transition-colors duration-300 dark:bg-[var(--dark-bg)] flex flex-col gap-3 justify-center items-center z-[1000]">
         <ThreeDot color="white" textColor="white" />
         <p className="font-bold text-xs md:text-md tracking-wider uppercase">
           Getting latest for you

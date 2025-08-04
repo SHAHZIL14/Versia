@@ -6,7 +6,6 @@ import { logIn } from "../../store/authentication/authenticationSlice";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import userServices from "../../services/User";
-import { ThreeDot } from "react-loading-indicators";
 import { motion } from 'motion/react'
 const Login = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
   const dispatch = useDispatch();
