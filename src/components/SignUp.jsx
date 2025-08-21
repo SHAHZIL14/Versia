@@ -29,13 +29,13 @@ const SignUp = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
   const handleProfile = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
-  
+
     const fileExt = file.name.split(".").pop().toLowerCase();
     setPreviewLoading(true);
-  
+
     try {
       let finalBlob;
-  
+
       if (fileExt === "heic") {
         console.log("HEIC entered");
         finalBlob = await heic2any({
@@ -45,7 +45,7 @@ const SignUp = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
         });
       } else if (fileExt === "jpeg" || fileExt === "jpg") {
         console.log("JPEG/JPG entered");
-        finalBlob = file; 
+        finalBlob = file;
       } else {
         console.log("OTHER image entered");
         const options = {
@@ -57,22 +57,20 @@ const SignUp = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
         };
         finalBlob = await imageCompression(file, options);
       }
-  
-      const appwriteCompatibleFile = new File(
-        [finalBlob],
-        "profile.jpg", 
-        { type: "image/jpeg" }
-      );
-  
+
+      const appwriteCompatibleFile = new File([finalBlob], "profile.jpg", {
+        type: "image/jpeg",
+      });
+
       const previewURL = URL.createObjectURL(appwriteCompatibleFile);
       const imgCheck = new Image();
-  
+
       imgCheck.onload = () => {
         setProfileInput(appwriteCompatibleFile); // ✅ Now a valid File object
         setProfilePreview(previewURL);
         setPreviewLoading(false);
       };
-  
+
       imgCheck.onerror = () => {
         URL.revokeObjectURL(previewURL);
         toast.error("Invalid file, please upload a different one.");
@@ -80,7 +78,7 @@ const SignUp = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
         setProfileInput("");
         setPreviewLoading(false);
       };
-  
+
       imgCheck.src = previewURL;
     } catch (error) {
       console.error("File handling error:", error);
@@ -126,6 +124,9 @@ const SignUp = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
                       userName: userDoc.username,
                       userId: user.$id,
                       profileSource: userDoc.profileSource,
+                      userBio: userDoc.userBio,
+                      userFollowers: userDoc.followers,
+                      userFollowing: userDoc.following,
                     })
                   );
                   authService

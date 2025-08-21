@@ -69,6 +69,8 @@ function ProfilePage({ mode }) {
     profileURL: "",
     userPosts: [],
     userBio: "",
+    userFollowers: 0,
+    userFollowing: 0,
   });
 
   const [followers, setFollowers] = useState(0);
@@ -83,6 +85,8 @@ function ProfilePage({ mode }) {
         profileURL: false || currentUserData.profileSource,
         userPosts: currentUserPosts || [],
         userBio: currentUserData.userBio,
+        userFollowers: currentUserData.userFollowers,
+        userFollowing: currentUserData.userFollowing,
       });
     } else {
       setUserData({
@@ -92,6 +96,8 @@ function ProfilePage({ mode }) {
         profileURL: false || loaderData.profileURL,
         userPosts: loaderData.userPosts || [],
         userBio: loaderData.userBio,
+        userFollowers: loaderData.userFollowers,
+        userFollowing: loaderData.userFollowing,
       });
     }
   }, [mode, currentUserData, currentUserPosts, loaderData]);
@@ -100,8 +106,13 @@ function ProfilePage({ mode }) {
     setBio(userData.userBio);
     setUserCurrentProfile(userData.profileURL);
     if (userData.userId) {
-      setFollowers(followersMap[userData.userId].followersCount);
-      setFollowing(followersMap[userData.userId].followingCount);
+      if (Object.keys(followersMap).includes(userData.userId)) {
+        setFollowers(followersMap[userData.userId].followersCount);
+        setFollowing(followersMap[userData.userId].followingCount);
+      } else {
+        setFollowers(userData.userFollowers);
+        setFollowing(userData.userFollowing);
+      }
     }
     setTimeout(() => setLoading(false), 200);
   }, [userData, followersMap]);
@@ -249,10 +260,7 @@ function ProfilePage({ mode }) {
 
   return loading ? (
     <div className="w-screen h-screen z-50 flex justify-center items-center bg-[var(--brand-color)] transition-colors duration-300 dark:bg-[var(--dark-bg)] fixed top-0 left-0">
-      <ThreeDot
-        color={`white`}
-        textColor="white"
-      />
+      <ThreeDot color={`white`} textColor="white" />
     </div>
   ) : (
     <div
@@ -504,5 +512,7 @@ export const userInfoLoader = async ({ params }) => {
     name: userInfo.name,
     username: userInfo.username,
     userBio: userInfo.userBio,
+    userFollowers: userInfo.followers,
+    userFollowing: userInfo.following,
   };
 };

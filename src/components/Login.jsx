@@ -6,7 +6,7 @@ import { logIn } from "../../store/authentication/authenticationSlice";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import userServices from "../../services/User";
-import { motion } from 'motion/react'
+import { motion } from "motion/react";
 const Login = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
   const dispatch = useDispatch();
   const navigateTo = useNavigate();
@@ -40,9 +40,12 @@ const Login = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
                 dispatch(
                   logIn({
                     name: userDoc.name,
-                    userName:userDoc.username,
+                    userName: userDoc.username,
                     userId: user.$id,
                     profileSource: userDoc.profileSource,
+                    userBio: userDoc.userBio,
+                    userFollowers: userDoc.followers,
+                    userFollowing: userDoc.following,
                   })
                 );
                 if (user.emailVerification) {
@@ -80,10 +83,10 @@ const Login = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
 
   return (
     <motion.div
-    whileInView={{ opacity: 1 }}
+      whileInView={{ opacity: 1 }}
       initial={{ opacity: 0 }}
-      transition={{ duration: 0.5}}
-      viewport={{ once: true }} 
+      transition={{ duration: 0.5 }}
+      viewport={{ once: true }}
     >
       <video
         autoPlay
@@ -92,7 +95,10 @@ const Login = ({ isUserNew, setIsUserNew, setAuthLoading }) => {
         playsInline
         className="absolute lg:-top-20 muted brightness-[20%] -left-0 w-full h-full lg:w-[140%] lg:h-[140%]  object-cover"
       >
-      <source src="https://res.cloudinary.com/ddoxcrq4q/video/upload/v1753309882/logIn_w1eyr5.mp4" type="video/mp4" />  
+        <source
+          src="https://res.cloudinary.com/ddoxcrq4q/video/upload/v1753309882/logIn_w1eyr5.mp4"
+          type="video/mp4"
+        />
       </video>
       <div
         className={`${
