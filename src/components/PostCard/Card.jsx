@@ -344,7 +344,7 @@ export const postInfoLoader = async ({ params, request }) => {
   const followees = JSON.parse(url.searchParams.get("followeeList") || "[]");
   const postData = await postServices.getPost(postId);
   const postMetaData = await postServices.getMetaPost(postData.$id);
-  const isLiked = await postServices.getIsLiked(postData.$id, userId);
+  const isLiked = (await postServices.getIsLiked(postData.$id, userId)).documents.length;
 
   const data = {
     authorId: postData.authorId,
