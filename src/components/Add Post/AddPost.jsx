@@ -25,7 +25,7 @@ const AddPost = () => {
   const authorName = useSelector((state) => state.auth.userData.name);
   const authorUserName = useSelector((state) => state.auth.userData.userName);
   const authorProfileURL = useSelector(
-    (state) => state.auth.userData.profileSource
+    (state) => state.auth.userData.profileSource,
   );
 
   const handleMedia = async (e) => {
@@ -100,6 +100,13 @@ const AddPost = () => {
       return;
     }
 
+    if (userId == "6889f49100015a4d1737") {
+      toast.error("Register yourself, this is a spare account.", {
+        autoClose: 4000,
+      });
+      return;
+    }
+
     if (!inputMedia) {
       toast.error("Please upload the picture.", {
         autoClose: 4000,
@@ -151,10 +158,7 @@ const AddPost = () => {
           isLoading ? "" : "hidden"
         } absolute top-0 left-0 h-full w-full z-10 bg-black/30 backdrop-blur-sm flex flex-col gap-5 justify-center items-center`}
       >
-        <BlinkBlur
-          color="var(--brand-color)"
-          textColor="white"
-        />
+        <BlinkBlur color="var(--brand-color)" textColor="white" />
         <p className="font-bold ">Don&apos;t move away , stay here. </p>
       </div>
       <button
@@ -174,6 +178,15 @@ const AddPost = () => {
         id="inputFile"
         type="file"
         accept="image/*"
+        onClick={(event) => {
+          if (userId == "6889f49100015a4d1737") {
+            toast.error("Register yourself, this is a spare account.", {
+              autoClose: 4000,
+            });
+            event.preventDefault();
+            return;
+          }
+        }}
         onChange={handleMedia}
       />
       <div

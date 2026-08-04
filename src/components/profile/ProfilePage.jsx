@@ -52,7 +52,7 @@ function ProfilePage({ mode }) {
   const currentUserData = useSelector((state) => state.auth.userData);
   const loaderData = useLoaderData();
   const isFollowing = useSelector((state) =>
-    state.auth.userData?.followees?.includes(loaderData?.userId)
+    state.auth.userData?.followees?.includes(loaderData?.userId),
   );
   const [localFollow, setLocalFollow] = useState(isFollowing);
 
@@ -112,6 +112,12 @@ function ProfilePage({ mode }) {
   }, [userData, followersMap]);
 
   const handleBioSave = async () => {
+    if (userId == "6889f49100015a4d1737") {
+      toast.error("Register yourself, this is a spare account.", {
+        autoClose: 4000,
+      });
+      return;
+    }
     setEditable((prev) => !prev);
     setBioLoading(true);
     userServices
@@ -191,6 +197,12 @@ function ProfilePage({ mode }) {
   };
 
   const updateProfilePic = async () => {
+    if (userId == "6889f49100015a4d1737") {
+      toast.error("Register yourself, this is a spare account.", {
+        autoClose: 4000,
+      });
+      return;
+    }
     setUpdateLoading(true);
     userServices
       .updateUserProfilePic(profileInput, currentUserData.userId)
@@ -211,6 +223,12 @@ function ProfilePage({ mode }) {
   };
 
   const handleFollowClick = async () => {
+    if (currentUserData.userId == "6889f49100015a4d1737") {
+      toast.error("Register yourself, this is a spare account.", {
+        autoClose: 4000,
+      });
+      return;
+    }
     if (isProcessing) return;
     setIsProcessing(true);
 
@@ -224,7 +242,7 @@ function ProfilePage({ mode }) {
           updateFollowees({
             type: "remove",
             authorId: loaderData.userId,
-          })
+          }),
         );
       } catch (error) {
         console.log(error);
@@ -288,7 +306,20 @@ function ProfilePage({ mode }) {
                       </button>
                     </>
                   ) : (
-                    <button onClick={() => setIsProfileEditable(true)}>
+                    <button
+                      onClick={() => {
+                        if (userData.userId == "6889f49100015a4d1737") {
+                          toast.error(
+                            "Register yourself, this is a spare account.",
+                            {
+                              autoClose: 4000,
+                            },
+                          );
+                          return;
+                        }
+                        setIsProfileEditable(true);
+                      }}
+                    >
                       <Edit2Icon className="h-4 w-4" />
                     </button>
                   )}
@@ -428,7 +459,19 @@ function ProfilePage({ mode }) {
                     {mode == "current" && (
                       <Edit2Icon
                         className="h-3 w-3 lg:h-5 cursor-pointer lg:w-5"
-                        onClick={() => setEditable((prev) => !prev)}
+                        onClick={() => {
+                          if (userData.userId == "6889f49100015a4d1737") {
+                            toast.error(
+                              "Register yourself, this is a spare account.",
+                              {
+                                autoClose: 4000,
+                              },
+                            );
+                            console.log("Hiii");
+                            return;
+                          }
+                          setEditable((prev) => !prev);
+                        }}
                       />
                     )}
                   </>
@@ -477,7 +520,7 @@ function ProfilePage({ mode }) {
                   navigate(
                     `/user/${currentUserData.userId}/post/${
                       eachPost.$id
-                    }?followeeList=${JSON.stringify(currentUserData.followees)}`
+                    }?followeeList=${JSON.stringify(currentUserData.followees)}`,
                   );
                   if (location.pathname.includes("post/")) setLoading(false);
                 }}

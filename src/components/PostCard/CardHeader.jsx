@@ -8,7 +8,7 @@ import { ThreeDot } from "react-loading-indicators";
 import userServices from "../../../services/User";
 import { updateFollowees } from "../../../store/authentication/authenticationSlice";
 import useFollowerStore from "../../../store/followers/followersStore";
-
+import { toast } from "react-toastify";
 function CardHeader({ postData }) {
   const {
     incrementFollower,
@@ -17,7 +17,7 @@ function CardHeader({ postData }) {
     decrementFollowing,
   } = useFollowerStore();
   const globalFollow = useSelector((state) =>
-    state.auth.userData?.followees?.includes(postData?.authorId)
+    state.auth.userData?.followees?.includes(postData?.authorId),
   );
 
   const [localFollow, setLocalFollow] = useState(globalFollow);
@@ -30,6 +30,13 @@ function CardHeader({ postData }) {
   const dispatch = useDispatch();
 
   const handleFollowClick = async () => {
+    if (userId == "6889f49100015a4d1737") {
+      toast.error("Register yourself, this is a spare account.", {
+        autoClose: 4000,
+      });
+      return;
+    }
+
     if (isProcessing) return;
     setIsProcessing(true);
     if (localFollow) {
@@ -42,7 +49,7 @@ function CardHeader({ postData }) {
           updateFollowees({
             type: "remove",
             authorId: postData.authorId,
-          })
+          }),
         );
       } catch (error) {
         console.error("Unfollow failed:", error);
