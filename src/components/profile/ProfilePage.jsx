@@ -259,7 +259,7 @@ function ProfilePage({ mode }) {
   ) : (
     <div
       id="profile"
-      className="min-h-screen w-screen flex flex-col gap-y-5 bg-white transition-colors duration-300 dark:bg-[var(--dark-bg)]"
+      className="min-h-screen w-full flex flex-col gap-y-5 bg-white transition-colors duration-300 dark:bg-[var(--dark-bg)]"
     >
       <div className="transition-colors duration-300 flex flex-col text-[var(--brand-color)] dark:text-[var(--dark-text)] py-3 px-2  ">
         <div className="flex gap-0 justify-between ">

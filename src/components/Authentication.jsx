@@ -48,7 +48,7 @@ const Authentication = () => {
 
       <div
         id="container-auth"
-        className="bg-white h-full w-full lg:h-screen lg:w-screen flex justify-center items-center"
+        className="bg-white h-full w-full lg:h-screen lg:w-full flex justify-center items-center"
       >
         <div className="h-full w-full lg:flex overflow-hidden">
           <div
@@ -67,7 +67,7 @@ const Authentication = () => {
             <div
               className={`background hidden lg:flex h-full z-10 w-full transition-all duration-200 ease-in-out ${
                 isUserNew ? "translate-x-full opacity-0" : "flex"
-              } bg-gradient-to-bl from-black/50 to-[var(--brand-color)] text-white text-3xl flex justify-center items-center absolute top-0 left-0`}
+              } bg-gradient-to-bl from-black/75 to-[var(--brand-color)] text-white text-3xl flex justify-center items-center absolute top-0 left-0`}
             >
               <img
                 loading="lazy-loading"
@@ -94,7 +94,7 @@ const Authentication = () => {
             <div
               className={`hidden lg:flex h-full w-full transition-all duration-200 ease-in-out ${
                 isUserNew ? "flex" : "-translate-x-full opacity-0"
-              } bg-gradient-to-br from-black/50 to-[var(--brand-color)] text-white text-3xl flex justify-center items-center absolute top-0 right-0`}
+              } bg-gradient-to-br from-black/75 to-[var(--brand-color)] text-white text-3xl flex justify-center items-center absolute top-0 right-0`}
             >
               <img
                 loading="lazy-loading"

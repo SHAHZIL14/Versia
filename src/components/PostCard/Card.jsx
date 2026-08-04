@@ -207,7 +207,7 @@ function Card({ data, mode }) {
       transition={{ duration: 0.5 }}
       viewport={{ once: true }}
       className={`${
-        mode === "specific" ? "min-h-screen w-screen" : "h-fit"
+        mode === "specific" ? "min-h-screen" : "h-fit"
       } w-full flex-col lg:items-center flex text-xs md:text-sm lg:text-md mx-auto overflow-hidden border-blue-80 pb-5 transition-colors duration-300 dark:bg-[var(--dark-bg)]`}
     >
       <div className="lg:w-96 ">
