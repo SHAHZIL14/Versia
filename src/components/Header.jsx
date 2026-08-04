@@ -11,11 +11,11 @@ import { toast } from "react-toastify";
 import DarkModeToggle from "./mode/DarkMode";
 
 const Header = ({ options }) => {
-  const username = useSelector((state) => state.auth.userData.name);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const profileSrc =
-    false || useSelector((state) => state.auth.userData.profileSource);
+  const profileSrc = useSelector(
+    (state) => state.auth.userData.profileSource
+  );
   let [isNavHidden, setIsNavHidden] = useState(true);
   const optionRef = useRef();
   const navRef = useRef();

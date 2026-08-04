@@ -45,6 +45,7 @@ function CardHeader({ postData }) {
           })
         );
       } catch (error) {
+        console.error("Unfollow failed:", error);
         setLocalFollow(true);
         incrementFollower(postData.authorId);
         incrementFollowing(userId);
@@ -59,6 +60,7 @@ function CardHeader({ postData }) {
         await userServices.follow(postData.authorId, userId);
         dispatch(updateFollowees({ type: "add", authorId: postData.authorId }));
       } catch (error) {
+        console.error("Follow failed:", error);
         setLocalFollow(false);
         decrementFollower(postData.authorId);
         decrementFollowing(userId);

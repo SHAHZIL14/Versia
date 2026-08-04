@@ -10,44 +10,24 @@ class StorageService {
     }
 
     async getFilesList() {
-        try {
-            const files = await this.storage.listFiles('687501a900076da2924b');
-            return files.files;
-        } catch (error) {
-            throw error;
-        }
-
-
+        const files = await this.storage.listFiles(config.bucketID);
+        return files.files;
     }
 
     async uploadFile(file) {
-        console.log("uploaded file = ", file);
-        try {
-            return await this.storage.createFile(
-                config.bucketID,
-                ID.unique(),
-                file
-            )
-        } catch (error) {
-            throw error;
-        }
+        return await this.storage.createFile(
+            config.bucketID,
+            ID.unique(),
+            file
+        )
     }
 
     async getFile(fileId) {
-        try {
-            return await this.storage.getFile(config.bucketID, fileId)
-        } catch (error) {
-            error
-        }
-
+        return await this.storage.getFile(config.bucketID, fileId)
     }
 
     getFileView(fileId) {
-        try {
-            return this.storage.getFileView(config.bucketID, fileId);
-        } catch (error) {
-            throw error;
-        }
+        return this.storage.getFileView(config.bucketID, fileId);
     }
 }
 const storageServices = new StorageService();

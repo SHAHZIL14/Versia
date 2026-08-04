@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from "react-redux";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import authService from "../services/Auth";
 import { ThreeDot } from "react-loading-indicators";
@@ -14,7 +14,7 @@ const AuthWatcher = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  let [refreshKey, setRefreshKey] = useState(0);
+  const refreshKey = useSelector((state) => state.refresh.refresh);
   const userId = useSelector((state) => state.auth.userData.userId);
   useEffect(() => {
     if (userId) return;
@@ -51,7 +51,8 @@ const AuthWatcher = () => {
         console.warn(error);
         dispatch(setLoading(false));
       });
-  }, [refreshKey]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshKey, userId]);
 
   const loading = useSelector((state) => state.auth.loading);
   return loading ? (
@@ -65,7 +66,3 @@ const AuthWatcher = () => {
 };
 
 export default AuthWatcher;
-
-export const runAuthWatcher = () => {
-  setRefreshKey((prev) => prev + 1);
-};

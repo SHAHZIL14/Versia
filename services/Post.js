@@ -10,179 +10,142 @@ class PostServices {
     }
 
     async addPost({ caption, imageUrl, status, userId, authorName, authorUserName, authorProfileURL }) {
-        try {
-            const post = await this.database.createDocument(
-                config.databaseID,
-                config.postCollectionID,
-                ID.unique(),
-                {
-                    'authorId': userId,
-                    'imageURL': imageUrl,
-                    'status': status,
-                    'caption': caption,
-                }
-            );
+        const post = await this.database.createDocument(
+            config.databaseID,
+            config.postCollectionID,
+            ID.unique(),
+            {
+                'authorId': userId,
+                'imageURL': imageUrl,
+                'status': status,
+                'caption': caption,
+            }
+        );
 
-            const postData = await this.database.createDocument(
-                config.databaseID,
-                config.postMetaCollectionID,
-                post.$id,
-                {
-                    'authorName': authorName,
-                    'authorUserName': authorUserName,
-                    'likes': 0,
-                    'comments': 0,
-                    'authorProfileURL': authorProfileURL,
-                    'postId': post.$id
-                }
-            );
-            return postData;
-        } catch (error) {
-            throw error;
-        }
+        const postData = await this.database.createDocument(
+            config.databaseID,
+            config.postMetaCollectionID,
+            post.$id,
+            {
+                'authorName': authorName,
+                'authorUserName': authorUserName,
+                'likes': 0,
+                'comments': 0,
+                'authorProfileURL': authorProfileURL,
+                'postId': post.$id
+            }
+        );
+        return postData;
     }
 
     async getPost(postId) {
-        try {
-            return await this.database.getDocument(
-                config.databaseID,
-                config.postCollectionID,
-                postId
-            );
-        } catch (error) {
-            throw error;
-        }
+        return await this.database.getDocument(
+            config.databaseID,
+            config.postCollectionID,
+            postId
+        );
     }
 
     async getMetaPost(postId) {
-        try {
-            const metaPost = await this.database.getDocument(
-                config.databaseID,
-                config.postMetaCollectionID,
-                postId
-            )
-            return metaPost;
-        } catch (error) {
-            throw error;
-        }
+        const metaPost = await this.database.getDocument(
+            config.databaseID,
+            config.postMetaCollectionID,
+            postId
+        )
+        return metaPost;
     }
 
     async getIsLiked(postId, userId) {
-        try {
-            const getIsLiked = await this.database.listDocuments(
-                config.databaseID,
-                config.postLikesCollectionID,
-                [
-                    Query.equal('postId', postId),
-                    Query.equal('userId', userId),
-                ]
-            );
-            return getIsLiked;
-        } catch (error) {
-            throw error;
-        }
+        const getIsLiked = await this.database.listDocuments(
+            config.databaseID,
+            config.postLikesCollectionID,
+            [
+                Query.equal('postId', postId),
+                Query.equal('userId', userId),
+            ]
+        );
+        return getIsLiked;
     }
 
-    async getPostBatch(cursorDocumentID) {
-        try {
-            return await this.database.listDocuments(
-                config.databaseID,
-                config.postCollectionID,
-                [Query.orderDesc('$createdAt')]
-            )
-        } catch (error) {
-            throw error
-        }
+    async getPostBatch() {
+        return await this.database.listDocuments(
+            config.databaseID,
+            config.postCollectionID,
+            [Query.orderDesc('$createdAt')]
+        )
     }
 
     async getMetaPostBatch(batch) {
-        try {
-            const postIds = batch.map((post) => post.$id);
-            const metaPost = await this.database.listDocuments(
-                config.databaseID,
-                config.postMetaCollectionID,
-                [Query.equal('postId', postIds)]
-            );
-            return metaPost;
-        } catch (error) {
-
-        }
+        const postIds = batch.map((post) => post.$id);
+        const metaPost = await this.database.listDocuments(
+            config.databaseID,
+            config.postMetaCollectionID,
+            [Query.equal('postId', postIds)]
+        );
+        return metaPost;
     }
 
     async getPostLikesBatch(postIdBatch, userId) {
-        try {
-
-            if (postIdBatch.length == 0 || !userId) {
-                return;
-            };
-            const result = await this.database.listDocuments(
-                config.databaseID,
-                config.postLikesCollectionID,
-                [
-                    Query.equal('postId', postIdBatch),
-                    Query.equal('userId', userId)
-                ]
-            );
-            return result;
-        } catch (error) {
-            throw error;
+        if (postIdBatch.length == 0 || !userId) {
+            return;
         }
+        const result = await this.database.listDocuments(
+            config.databaseID,
+            config.postLikesCollectionID,
+            [
+                Query.equal('postId', postIdBatch),
+                Query.equal('userId', userId)
+            ]
+        );
+        return result;
     }
 
     async likePost(postId, postMetaId, userId, currentLikes) {
-        try {
-            const likeDocument = await this.database.createDocument(
-                config.databaseID,
-                config.postLikesCollectionID,
-                ID.unique(),
-                {
-                    postId: postId,
-                    userId: userId
-                }
-            );
-            const like = await this.database.updateDocument(
-                config.databaseID,
-                config.postMetaCollectionID,
-                postMetaId,
-                {
-                    likes: currentLikes
-                }
-            );
-            return like;
-        } catch (error) {
-            throw error;
-        }
+        await this.database.createDocument(
+            config.databaseID,
+            config.postLikesCollectionID,
+            ID.unique(),
+            {
+                postId: postId,
+                userId: userId
+            }
+        );
+        const like = await this.database.updateDocument(
+            config.databaseID,
+            config.postMetaCollectionID,
+            postMetaId,
+            {
+                likes: currentLikes
+            }
+        );
+        return like;
     }
 
     async unlikePost(postId, postMetaId, userId, currentLikes) {
-        try {
-            const idToDelete = (await this.database.listDocuments(
-                config.databaseID,
-                config.postLikesCollectionID,
-                [
-                    Query.equal('postId', postId),
-                    Query.equal('userId', userId)
-                ]
-            )).documents[0].$id;
+        const idToDelete = (await this.database.listDocuments(
+            config.databaseID,
+            config.postLikesCollectionID,
+            [
+                Query.equal('postId', postId),
+                Query.equal('userId', userId)
+            ]
+        )).documents[0].$id;
 
-            const deleteDoc = await this.database.deleteDocument(
-                config.databaseID,
-                config.postLikesCollectionID,
-                idToDelete
-            );
+        await this.database.deleteDocument(
+            config.databaseID,
+            config.postLikesCollectionID,
+            idToDelete
+        );
 
-            const unlike = await this.database.updateDocument(
-                config.databaseID,
-                config.postMetaCollectionID,
-                postMetaId,
-                {
-                    likes: currentLikes
-                }
-            );
-            return unlike;
-        } catch (error) {
-            throw error;
-        }
+        const unlike = await this.database.updateDocument(
+            config.databaseID,
+            config.postMetaCollectionID,
+            postMetaId,
+            {
+                likes: currentLikes
+            }
+        );
+        return unlike;
     }
 }
 const postServices = new PostServices();

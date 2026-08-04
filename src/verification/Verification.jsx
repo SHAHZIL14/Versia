@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import authService from "../../services/Auth";
 import { toast } from "react-toastify";
 import { ThreeDot } from "react-loading-indicators";
@@ -30,6 +30,7 @@ const Verification = () => {
         authService.logout();
         navigate("/auth");
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

@@ -5,7 +5,7 @@ import { motion } from "motion/react";
 import React from "react";
 import postServices from "../../../services/Post";
 import { useSelector } from "react-redux";
-import { useLoaderData, useParams } from "react-router-dom";
+import { useLoaderData } from "react-router-dom";
 import { ThreeDot } from "react-loading-indicators";
 import { AnimatePresence } from "framer-motion";
 import Toastify from "toastify-js";
@@ -111,13 +111,14 @@ function Card({ data, mode }) {
       updatePostLikeCache(postId, updatedLikes, false);
 
       try {
-        const result = await postServices.unlikePost(
+        await postServices.unlikePost(
           postId,
           postData.postMetaId,
           userId,
           updatedLikes
         );
       } catch (error) {
+        console.error("Unlike failed:", error);
         setLikes((prev) => prev + 1);
         setIsLiked(true);
         updatePostLikeCache(postId, likes, true);
@@ -131,7 +132,7 @@ function Card({ data, mode }) {
       updatePostLikeCache(postId, updatedLikes, true);
 
       try {
-        const result = await postServices.likePost(
+        await postServices.likePost(
           postId,
           postData.postMetaId,
           userId,
@@ -337,11 +338,10 @@ function Card({ data, mode }) {
 
 export default React.memo(Card);
 
-export const postInfoLoader = async ({ params, request }) => {
+// eslint-disable-next-line react-refresh/only-export-components
+export const postInfoLoader = async ({ params }) => {
   const { postId } = params;
   const { userId } = params;
-  const url = new URL(request.url);
-  const followees = JSON.parse(url.searchParams.get("followeeList") || "[]");
   const postData = await postServices.getPost(postId);
   const postMetaData = await postServices.getMetaPost(postData.$id);
   const isLiked = (await postServices.getIsLiked(postData.$id, userId)).documents.length;
@@ -357,7 +357,7 @@ export const postInfoLoader = async ({ params, request }) => {
     caption: postData.caption,
     postId: postMetaData.postId,
     $id: postMetaData.$id,
-    isLiked: false || isLiked,
+    isLiked: Boolean(isLiked),
     createdAt: postData.$createdAt,
   };
   return data;

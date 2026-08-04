@@ -1,11 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ImageUp, ImagePlus } from "lucide-react";
 import { toast } from "react-toastify";
 import { X } from "lucide-react";
 import storageServices from "../../../services/Storage";
 import postServices from "../../../services/Post";
 import { useDispatch, useSelector } from "react-redux";
-import { refresh } from "../../../store/refresh/refreshSlice";
 import { changeIsFetched } from "../../../store/Post/PostSlice";
 import { BlinkBlur, ThreeDot } from "react-loading-indicators";
 import { useNavigate } from "react-router-dom";
@@ -156,10 +155,10 @@ const AddPost = () => {
           color="var(--brand-color)"
           textColor="white"
         />
-        <p className="font-bold ">Don't move away , stay here. </p>
+        <p className="font-bold ">Don&apos;t move away , stay here. </p>
       </div>
       <button
-        onClick={(e) => {
+        onClick={() => {
           navigate(-1);
           setInputMedia("");
           setCaption("");

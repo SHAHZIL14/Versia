@@ -10,58 +10,34 @@ class AuthenticationServices {
     }
 
     async register(email, password, name) {
-        try {
-            return await this.account.create(
-                ID.unique(),
-                email,
-                password,
-                name
-            );
+                return await this.account.create(
+            ID.unique(),
+            email,
+            password,
+            name
+        );
 
-        } catch (error) {
-            throw error
-        }
     }
 
     async login(email, password) {
-        try {
-            await this.account.createEmailPasswordSession(email, password);
-            return await this.getUser();
-        } catch (error) {
-            throw error;
-        }
+                await this.account.createEmailPasswordSession(email, password);
+        return await this.getUser();
     }
 
     async logout() {
-        try {
-            return await this.account.deleteSessions();
-        } catch (error) {
-            throw error;
-        }
+                return await this.account.deleteSessions();
     }
 
     async getUser() {
-        try {
-            return await this.account.get()
-        } catch (error) {
-            throw error;
-        }
+                return await this.account.get()
     }
 
     async sendVerificationLink() {
-        try {
-            return await this.account.createVerification('https://versia.vercel.app/verify');
-        } catch (error) {
-            throw error
-        }
+                return await this.account.createVerification('https://versia.vercel.app/verify');
     }
 
     async verifyEmailAddress(userId, secret) {
-        try {
-            return await this.account.updateVerification(userId, secret);
-        } catch (error) {
-            throw error;
-        }
+                return await this.account.updateVerification(userId, secret);
     }
 }
 const authService = new AuthenticationServices();

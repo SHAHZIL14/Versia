@@ -37,7 +37,8 @@ const authenticationSlice = createSlice({
                         break;
                     case 'remove':
                         state.userData.followees = prev.filter((id) => id != action.payload.authorId);
-                    default: ''
+                        break;
+                    default:
                         break;
                 }
             }

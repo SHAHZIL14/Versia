@@ -25,13 +25,13 @@ const Feed = () => {
   const isFetched = useSelector((state) => state.Post.isFetched);
 
   const [loading, setLoading] = useState(!isFetched);
-  const [followeeList, setFolloweeList] = useState(null);
   useEffect(() => {
     if (!isFetched) {
       fetchPosts();
       fetchCurrentUserProfile();
       getCurrentUserFolloweeList();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFetched, userId]);
 
   const fetchPosts = async () => {
@@ -74,7 +74,6 @@ const Feed = () => {
     try {
       const followersDocs = await userServices.getUsersFollowee(userId);
       const followeeIdList = followersDocs.map((doc) => doc.followeeId);
-      setFolloweeList(followeeIdList);
       dispatch(updateFollowees(followeeIdList));
     } catch (error) {
       console.log(error);
@@ -99,6 +98,7 @@ const Feed = () => {
       getPostsLikes().then(() => setLoading(false));
       getFollowersCount();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storedPost, userId]);
 
   const memoizedPosts = useMemo(() => {
@@ -127,7 +127,7 @@ const Feed = () => {
         <Card data={data} mode={mode} key={post.data?.$id || ID.unique()} />
       );
     });
-  }, [storedPost, storedPostLikes]);
+  }, [storedPost, storedPostLikes, followees]);
 
   if (loading) {
     return (

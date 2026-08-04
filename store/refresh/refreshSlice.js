@@ -6,7 +6,7 @@ const refreshSlice = createSlice({
         refresh: 0,
     },
     reducers: {
-        refresh: function (state, action) {
+        refresh: function (state) {
             state.refresh++;
         }
     }

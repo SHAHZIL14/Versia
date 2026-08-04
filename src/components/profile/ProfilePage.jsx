@@ -56,12 +56,6 @@ function ProfilePage({ mode }) {
   );
   const [localFollow, setLocalFollow] = useState(isFollowing);
 
-  const globalFollow = useSelector(
-    (state) =>
-      !!loaderData?.userId &&
-      state.auth.userData?.followees?.includes(loaderData.userId)
-  );
-
   const [userData, setUserData] = useState({
     userId: null,
     name: "",
@@ -82,7 +76,7 @@ function ProfilePage({ mode }) {
         userId: currentUserData.userId,
         name: currentUserData.name,
         username: currentUserData.userName,
-        profileURL: false || currentUserData.profileSource,
+        profileURL: currentUserData.profileSource,
         userPosts: currentUserPosts || [],
         userBio: currentUserData.userBio,
         userFollowers: currentUserData.userFollowers,
@@ -93,7 +87,7 @@ function ProfilePage({ mode }) {
         userId: loaderData.userId,
         name: loaderData.name,
         username: loaderData.username,
-        profileURL: false || loaderData.profileURL,
+        profileURL: loaderData.profileURL,
         userPosts: loaderData.userPosts || [],
         userBio: loaderData.userBio,
         userFollowers: loaderData.userFollowers,
@@ -501,6 +495,7 @@ function ProfilePage({ mode }) {
 
 export default ProfilePage;
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const userInfoLoader = async ({ params }) => {
   const userId = params.userId;
   const userInfo = await userServices.getUserInfo(userId);

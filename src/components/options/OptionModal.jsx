@@ -17,7 +17,10 @@ const OptionModal = ({ isOptionOpen, setIsOptionOpen }) => {
     >
       <ul className="px-2">
         <li
-          onClick={() => navigate(`/profile`)}
+          onClick={() => {
+            setIsOptionOpen(false);
+            navigate(`/profile`);
+          }}
           className="px-2 transition duration-300 rounded-lg ease-in-out cursor-pointer  my-1  flex gap-x-3 items-center capitalize"
         >
           <CircleUserRound
@@ -28,7 +31,19 @@ const OptionModal = ({ isOptionOpen, setIsOptionOpen }) => {
         </li>
         <li
           onClick={() => {
-            
+            authService
+              .logout()
+              .then(() => {
+                dispatch(logOut());
+                setIsOptionOpen(false);
+                toast.success("Logged out successfully", {
+                  className: "my-toast",
+                  bodyClassName: "my-toast-body",
+                });
+              })
+              .catch((error) => {
+                toast.error(error.message || "Failed to log out");
+              });
           }}
           className="px-2 transition duration-300 rounded-lg ease-in-out cursor-pointer my-1 flex gap-x-3 items-center capitalize"
         >

@@ -3,17 +3,11 @@ import { RouterProvider } from "react-router-dom";
 import { createBrowserRouter } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { Navigate } from "react-router-dom";
-import Home from "./components/Home";
-import AddPost from "./components/Add Post/AddPost";
 import Authentication from "./components/Authentication";
-import About from "./components/About";
 import AuthLayout from "../layout/AuthLayout";
-import Verification from "./verification/Verification";
 import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";;
-import ProfilePage, { userInfoLoader } from "./components/profile/ProfilePage";
-import Card from "./components/PostCard/Card";
-import { postInfoLoader } from "./components/PostCard/Card";
+import "react-toastify/dist/ReactToastify.css";
+
 function App() {
   const router = createBrowserRouter([
     {
@@ -24,29 +18,60 @@ function App() {
           element: <ProtectedRoute />,
           children: [
             { index: true, element: <Navigate to="/home" /> },
-            { path: "/home", element: <Home /> },
-            { path: "/add-post", element: <AddPost /> },
+            {
+              path: "/home",
+              lazy: async () => {
+                const { default: Component } = await import("./components/Home");
+                return { Component };
+              },
+            },
+            {
+              path: "/add-post",
+              lazy: async () => {
+                const { default: Component } = await import("./components/Add Post/AddPost");
+                return { Component };
+              },
+            },
           ],
         },
-        { path: "/about", element: <About /> },
-        { path: "/verify", element: <Verification /> },
+        {
+          path: "/about",
+          lazy: async () => {
+            const { default: Component } = await import("./components/About");
+            return { Component };
+          },
+        },
+        {
+          path: "/verify",
+          lazy: async () => {
+            const { default: Component } = await import("./verification/Verification");
+            return { Component };
+          },
+        },
         { path: "/auth", element: <Authentication /> },
         { path: "*", element: <Navigate to="/" /> },
       ],
     },
     {
       path: "/profile",
-      element: <ProfilePage mode={"current"} />,
+      lazy: async () => {
+        const { default: Component } = await import("./components/profile/ProfilePage");
+        return { Component: () => <Component mode={"current"} /> };
+      },
     },
     {
       path: "/user/:userId",
-      element: <ProfilePage mode={"public"} />,
-      loader: userInfoLoader,
+      lazy: async () => {
+        const { default: Component, userInfoLoader } = await import("./components/profile/ProfilePage");
+        return { Component: () => <Component mode={"public"} />, loader: userInfoLoader };
+      },
     },
     {
       path: "/user/:userId/post/:postId",
-      element: <Card data={null} mode={"specific"} />,
-      loader: postInfoLoader,
+      lazy: async () => {
+        const { default: Component, postInfoLoader } = await import("./components/PostCard/Card");
+        return { Component: () => <Component data={null} mode={"specific"} />, loader: postInfoLoader };
+      },
     },
   ]);
 
